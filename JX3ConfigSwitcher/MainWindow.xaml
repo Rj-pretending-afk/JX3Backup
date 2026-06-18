@@ -5,66 +5,66 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="剑3备份器"
-        Height="820"
         Width="1280"
+        Height="820"
+        MinWidth="1120"
         MinHeight="720"
-        MinWidth="1100"
-        Background="Transparent"
-        Foreground="#F5F8FF"
+        Background="#0F141B"
+        Foreground="#E8EEF8"
         FontFamily="Microsoft YaHei UI, Segoe UI, Arial"
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="ClearType">
     <Window.Resources>
-        <SolidColorBrush x:Key="GlassPanelBrush" Color="#CC111824"/>
-        <SolidColorBrush x:Key="GlassPanelSoftBrush" Color="#99172230"/>
-        <SolidColorBrush x:Key="GlassInputBrush" Color="#80101824"/>
-        <SolidColorBrush x:Key="GlassInputHoverBrush" Color="#A91A2636"/>
-        <SolidColorBrush x:Key="GlassBorderBrush" Color="#55DCE7FF"/>
-        <SolidColorBrush x:Key="GlassBorderStrongBrush" Color="#88DCE7FF"/>
-        <SolidColorBrush x:Key="AccentBrush" Color="#7CC7FF"/>
-        <SolidColorBrush x:Key="AccentDeepBrush" Color="#2F80ED"/>
-        <SolidColorBrush x:Key="AccentSoftBrush" Color="#333FA7FF"/>
-        <SolidColorBrush x:Key="DangerBrush" Color="#FF7A8A"/>
-        <SolidColorBrush x:Key="DangerDeepBrush" Color="#A23A45"/>
-        <SolidColorBrush x:Key="MutedBrush" Color="#B7C3D7"/>
-        <SolidColorBrush x:Key="TextBrush" Color="#F5F8FF"/>
-        <SolidColorBrush x:Key="SubtleTextBrush" Color="#8E9AAF"/>
+        <SolidColorBrush x:Key="AppBackground" Color="#0F141B"/>
+        <SolidColorBrush x:Key="PanelBrush" Color="#151B24"/>
+        <SolidColorBrush x:Key="PanelAltBrush" Color="#111821"/>
+        <SolidColorBrush x:Key="InputBrush" Color="#0F1620"/>
+        <SolidColorBrush x:Key="InputHoverBrush" Color="#172232"/>
+        <SolidColorBrush x:Key="LineBrush" Color="#2B3544"/>
+        <SolidColorBrush x:Key="LineStrongBrush" Color="#3B4960"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#2F80ED"/>
+        <SolidColorBrush x:Key="AccentHoverBrush" Color="#3D8EFF"/>
+        <SolidColorBrush x:Key="AccentSoftBrush" Color="#183B62"/>
+        <SolidColorBrush x:Key="DangerBrush" Color="#F05D6A"/>
+        <SolidColorBrush x:Key="DangerSoftBrush" Color="#4A1E28"/>
+        <SolidColorBrush x:Key="TextBrush" Color="#E8EEF8"/>
+        <SolidColorBrush x:Key="MutedBrush" Color="#99A6BA"/>
+        <SolidColorBrush x:Key="SubtleBrush" Color="#6F7D91"/>
 
-        <DropShadowEffect x:Key="GlassShadow"
-                          BlurRadius="28"
-                          ShadowDepth="0"
-                          Opacity="0.28"
+        <DropShadowEffect x:Key="PanelShadow"
+                          BlurRadius="12"
+                          ShadowDepth="2"
+                          Opacity="0.16"
                           Color="#000000"/>
 
         <Style TargetType="TextBlock">
-            <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI, Arial"/>
             <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI, Arial"/>
         </Style>
 
-        <Style x:Key="GlassBorder" TargetType="Border">
-            <Setter Property="Background" Value="{StaticResource GlassPanelBrush}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource GlassBorderBrush}"/>
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource PanelBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="24"/>
+            <Setter Property="CornerRadius" Value="8"/>
             <Setter Property="Padding" Value="16"/>
-            <Setter Property="Effect" Value="{StaticResource GlassShadow}"/>
+            <Setter Property="Effect" Value="{StaticResource PanelShadow}"/>
         </Style>
 
-        <Style x:Key="MiniGlassBorder" TargetType="Border" BasedOn="{StaticResource GlassBorder}">
-            <Setter Property="CornerRadius" Value="18"/>
+        <Style x:Key="SmallCard" TargetType="Border" BasedOn="{StaticResource Card}">
             <Setter Property="Padding" Value="12"/>
             <Setter Property="Effect" Value="{x:Null}"/>
         </Style>
 
         <Style TargetType="Button">
-            <Setter Property="Foreground" Value="#F8FBFF"/>
-            <Setter Property="Background" Value="{StaticResource GlassInputBrush}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource GlassBorderBrush}"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="Background" Value="#1A2432"/>
+            <Setter Property="BorderBrush" Value="{StaticResource LineStrongBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="14,9"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="MinHeight" Value="36"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="MinHeight" Value="38"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -72,24 +72,17 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="18"
-                                SnapsToDevicePixels="True">
+                                CornerRadius="8">
                             <ContentPresenter HorizontalAlignment="Center"
                                               VerticalAlignment="Center"
                                               Margin="{TemplateBinding Padding}"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="{StaticResource GlassInputHoverBrush}"/>
-                                <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource GlassBorderStrongBrush}"/>
+                                <Setter TargetName="Root" Property="Background" Value="#223047"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="{StaticResource AccentSoftBrush}"/>
-                                <Setter TargetName="Root" Property="RenderTransform">
-                                    <Setter.Value>
-                                        <TranslateTransform Y="1"/>
-                                    </Setter.Value>
-                                </Setter>
+                                <Setter TargetName="Root" Property="Background" Value="#182130"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="Root" Property="Opacity" Value="0.45"/>
@@ -101,19 +94,19 @@
         </Style>
 
         <Style x:Key="PrimaryButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-            <Setter Property="Background" Value="#CC2F80ED"/>
-            <Setter Property="BorderBrush" Value="#AA9FD7FF"/>
+            <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="BorderBrush" Value="#58A4FF"/>
         </Style>
 
         <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-            <Setter Property="Background" Value="#BBA23A45"/>
-            <Setter Property="BorderBrush" Value="#CCFF9AA5"/>
+            <Setter Property="Background" Value="{StaticResource DangerSoftBrush}"/>
+            <Setter Property="BorderBrush" Value="#8A3541"/>
         </Style>
 
         <Style TargetType="TextBox">
-            <Setter Property="Background" Value="{StaticResource GlassInputBrush}"/>
+            <Setter Property="Background" Value="{StaticResource InputBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource GlassBorderBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource LineStrongBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="12,8"/>
             <Setter Property="CaretBrush" Value="{StaticResource AccentBrush}"/>
@@ -125,14 +118,13 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="16">
+                                CornerRadius="8">
                             <ScrollViewer x:Name="PART_ContentHost"
                                           Margin="{TemplateBinding Padding}"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="{StaticResource GlassInputHoverBrush}"/>
-                                <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource GlassBorderStrongBrush}"/>
+                                <Setter TargetName="Root" Property="Background" Value="{StaticResource InputHoverBrush}"/>
                             </Trigger>
                             <Trigger Property="IsKeyboardFocused" Value="True">
                                 <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
@@ -144,11 +136,10 @@
         </Style>
 
         <Style TargetType="ComboBox">
-            <Setter Property="Background" Value="{StaticResource GlassInputBrush}"/>
+            <Setter Property="Background" Value="{StaticResource InputBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource GlassBorderBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource LineStrongBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="12,8"/>
             <Setter Property="MinHeight" Value="38"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -167,15 +158,15 @@
                                                 Background="{TemplateBinding Background}"
                                                 BorderBrush="{TemplateBinding BorderBrush}"
                                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                                CornerRadius="16">
+                                                CornerRadius="8">
                                             <Grid Margin="12,0">
                                                 <ContentPresenter Content="{Binding SelectionBoxItem, RelativeSource={RelativeSource AncestorType=ComboBox}}"
-                                                                  VerticalAlignment="Center"
-                                                                  HorizontalAlignment="Left"/>
-                                                <Path HorizontalAlignment="Right"
+                                                                  HorizontalAlignment="Left"
+                                                                  VerticalAlignment="Center"/>
+                                                <Path Data="M 0 0 L 5 5 L 10 0"
+                                                      HorizontalAlignment="Right"
                                                       VerticalAlignment="Center"
-                                                      Data="M 0 0 L 5 5 L 10 0"
-                                                      Stroke="#DCE7F7"
+                                                      Stroke="#C7D2E5"
                                                       StrokeThickness="2"
                                                       StrokeStartLineCap="Round"
                                                       StrokeEndLineCap="Round"/>
@@ -183,8 +174,7 @@
                                         </Border>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="Root" Property="Background" Value="{StaticResource GlassInputHoverBrush}"/>
-                                                <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource GlassBorderStrongBrush}"/>
+                                                <Setter TargetName="Root" Property="Background" Value="{StaticResource InputHoverBrush}"/>
                                             </Trigger>
                                         </ControlTemplate.Triggers>
                                     </ControlTemplate>
@@ -196,38 +186,32 @@
                                    AllowsTransparency="True"
                                    PopupAnimation="Fade"
                                    MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
-                                <Border Margin="0,8,0,0"
-                                        Background="#F0182230"
-                                        BorderBrush="{StaticResource GlassBorderStrongBrush}"
+                                <Border Margin="0,6,0,0"
+                                        Background="#151B24"
+                                        BorderBrush="{StaticResource LineStrongBrush}"
                                         BorderThickness="1"
-                                        CornerRadius="16"
-                                        Padding="6">
+                                        CornerRadius="8"
+                                        Padding="4">
                                     <ScrollViewer MaxHeight="220">
                                         <ItemsPresenter/>
                                     </ScrollViewer>
                                 </Border>
                             </Popup>
                         </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                                <Setter TargetName="Toggle" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
 
         <Style TargetType="ComboBoxItem">
-            <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
-            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Padding" Value="10,7"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ComboBoxItem">
                         <Border x:Name="Root"
-                                Background="{TemplateBinding Background}"
-                                CornerRadius="12"
+                                Background="Transparent"
+                                CornerRadius="6"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter/>
                         </Border>
@@ -250,37 +234,35 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="CheckBox">
-                        <Grid Margin="0,4">
+                        <Grid Margin="0,5">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="28"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <Border x:Name="Box"
-                                    Width="20"
-                                    Height="20"
-                                    CornerRadius="8"
-                                    Background="{StaticResource GlassInputBrush}"
-                                    BorderBrush="{StaticResource GlassBorderBrush}"
+                                    Width="18"
+                                    Height="18"
+                                    CornerRadius="6"
+                                    Background="{StaticResource InputBrush}"
+                                    BorderBrush="{StaticResource LineStrongBrush}"
                                     BorderThickness="1"
                                     VerticalAlignment="Top"/>
                             <Path x:Name="CheckMark"
-                                  Data="M 5 10 L 9 14 L 16 6"
+                                  Data="M 4 9 L 8 13 L 15 5"
                                   Stroke="#FFFFFF"
                                   StrokeThickness="2.2"
                                   StrokeStartLineCap="Round"
                                   StrokeEndLineCap="Round"
                                   Visibility="Collapsed"/>
-                            <ContentPresenter Grid.Column="1"
-                                              VerticalAlignment="Center"/>
+                            <ContentPresenter Grid.Column="1"/>
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource GlassBorderStrongBrush}"/>
-                                <Setter TargetName="Box" Property="Background" Value="{StaticResource GlassInputHoverBrush}"/>
+                                <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Box" Property="Background" Value="{StaticResource AccentDeepBrush}"/>
-                                <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                <Setter TargetName="Box" Property="Background" Value="{StaticResource AccentBrush}"/>
+                                <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource AccentHoverBrush}"/>
                                 <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -296,7 +278,7 @@
         </Style>
 
         <Style TargetType="ListBoxItem">
-            <Setter Property="Margin" Value="0,3"/>
+            <Setter Property="Margin" Value="0,2"/>
             <Setter Property="Padding" Value="10,8"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -305,14 +287,13 @@
                                 Background="Transparent"
                                 BorderBrush="Transparent"
                                 BorderThickness="1"
-                                CornerRadius="16"
+                                CornerRadius="8"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="{StaticResource GlassInputBrush}"/>
-                                <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource GlassBorderBrush}"/>
+                                <Setter TargetName="Root" Property="Background" Value="#192333"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="Root" Property="Background" Value="{StaticResource AccentSoftBrush}"/>
@@ -327,28 +308,28 @@
         <Style TargetType="DataGrid">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
-            <Setter Property="RowBackground" Value="#33172230"/>
-            <Setter Property="AlternatingRowBackground" Value="#22172230"/>
+            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="GridLinesVisibility" Value="None"/>
             <Setter Property="HeadersVisibility" Value="Column"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="CanUserResizeRows" Value="False"/>
-            <Setter Property="RowHeight" Value="38"/>
+            <Setter Property="RowHeight" Value="34"/>
+            <Setter Property="ColumnHeaderHeight" Value="36"/>
+            <Setter Property="RowBackground" Value="Transparent"/>
+            <Setter Property="AlternatingRowBackground" Value="#101821"/>
         </Style>
 
         <Style TargetType="DataGridColumnHeader">
-            <Setter Property="Background" Value="#55172230"/>
+            <Setter Property="Background" Value="#111821"/>
             <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Padding" Value="10,7"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
 
         <Style TargetType="DataGridRow">
-            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource GlassInputHoverBrush}"/>
+                    <Setter Property="Background" Value="#182232"/>
                 </Trigger>
                 <Trigger Property="IsSelected" Value="True">
                     <Setter Property="Background" Value="{StaticResource AccentSoftBrush}"/>
@@ -356,130 +337,109 @@
             </Style.Triggers>
         </Style>
 
-        <Style TargetType="Slider">
-            <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
-            <Setter Property="Background" Value="{StaticResource GlassInputBrush}"/>
+        <Style TargetType="DataGridCell">
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridCell">
+                        <Border Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AccentSoftBrush}"/>
+                    <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
 
-        <Style x:Key="ProfileTemplateText" TargetType="TextBlock">
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="FontSize" Value="14"/>
+        <Style TargetType="Slider">
+            <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="Background" Value="{StaticResource LineBrush}"/>
         </Style>
 
         <DataTemplate x:Key="ProfileTemplate">
-            <TextBlock Text="{Binding Name}" Style="{StaticResource ProfileTemplateText}"/>
+            <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
         </DataTemplate>
     </Window.Resources>
 
-    <Grid>
-        <Grid.Background>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#151B2C" Offset="0"/>
-                <GradientStop Color="#0D1118" Offset="0.48"/>
-                <GradientStop Color="#102335" Offset="1"/>
-            </LinearGradientBrush>
-        </Grid.Background>
+    <Grid Background="{StaticResource AppBackground}" Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="82"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="44"/>
+        </Grid.RowDefinitions>
 
-        <Border Margin="22"
-                Background="#221E88E5"
-                CornerRadius="38"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Width="360"
-                Height="220"
-                Opacity="0.55"/>
-        <Border Margin="0,0,42,32"
-                Background="#2265E4C8"
-                CornerRadius="44"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Bottom"
-                Width="420"
-                Height="260"
-                Opacity="0.38"/>
+        <Border Grid.Row="0" Style="{StaticResource Card}" Padding="18,12" Margin="0,0,0,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="420"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="剑3备份器" FontSize="28" FontWeight="Bold"/>
+                    <TextBlock Text="便携式键位、界面与角色配置备份切换"
+                               Margin="0,4,0,0"
+                               Foreground="{StaticResource MutedBrush}"/>
+                </StackPanel>
+                <Border Grid.Column="1"
+                        Background="{StaticResource InputBrush}"
+                        BorderBrush="{StaticResource LineBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="12,8"
+                        VerticalAlignment="Center">
+                    <TextBlock Text="{Binding StatusMessage}" TextTrimming="CharacterEllipsis"/>
+                </Border>
+            </Grid>
+        </Border>
 
-        <Grid Margin="18">
+        <Grid Grid.Row="1" Margin="0,0,0,14">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="260"/>
+                <ColumnDefinition Width="240"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="372"/>
+                <ColumnDefinition Width="340"/>
             </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
 
-            <Border Grid.ColumnSpan="3"
-                    Style="{StaticResource MiniGlassBorder}"
-                    Padding="18,14"
-                    Margin="0,0,0,16">
-                <DockPanel>
-                    <StackPanel DockPanel.Dock="Left">
-                        <TextBlock Text="剑3备份器"
-                                   FontSize="30"
-                                   FontWeight="Bold"/>
-                        <TextBlock Text="便携式键位、界面与角色配置备份切换"
-                                   Margin="0,5,0,0"
-                                   Foreground="{StaticResource MutedBrush}"
-                                   FontSize="13"/>
-                    </StackPanel>
-                    <Border DockPanel.Dock="Right"
-                            Background="{StaticResource GlassInputBrush}"
-                            BorderBrush="{StaticResource GlassBorderBrush}"
-                            BorderThickness="1"
-                            CornerRadius="18"
-                            Padding="14,9"
-                            MaxWidth="520">
-                        <TextBlock Text="{Binding StatusMessage}"
-                                   Foreground="#DCE7F7"
-                                   TextTrimming="CharacterEllipsis"/>
-                    </Border>
-                </DockPanel>
-            </Border>
-
-            <Border Grid.Row="1"
-                    Grid.Column="0"
-                    Style="{StaticResource GlassBorder}">
+            <Border Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,14,0">
                 <DockPanel LastChildFill="True">
                     <StackPanel DockPanel.Dock="Top">
-                        <TextBlock Text="用户 Profile"
-                                   FontSize="16"
-                                   FontWeight="Bold"/>
+                        <TextBlock Text="用户 Profile" FontSize="16" FontWeight="Bold"/>
                         <Button Content="+ 新建用户"
-                                Margin="0,12,0,16"
+                                Margin="0,12,0,12"
                                 Command="{Binding CreateProfileCommand}"
                                 Style="{StaticResource PrimaryButton}"/>
                     </StackPanel>
-
                     <ListBox ItemsSource="{Binding Profiles}"
                              SelectedItem="{Binding SelectedProfile}"
                              ItemTemplate="{StaticResource ProfileTemplate}"/>
                 </DockPanel>
             </Border>
 
-            <Grid Grid.Row="1"
-                  Grid.Column="1"
-                  Margin="16,0">
+            <Grid Grid.Column="1" Margin="0,0,14,0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="2*"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="104"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="190"/>
                 </Grid.RowDefinitions>
 
-                <Border Style="{StaticResource GlassBorder}">
+                <Border Grid.Row="0" Style="{StaticResource Card}" Margin="0,0,0,14">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel>
-                            <TextBlock Text="游戏路径"
-                                       FontSize="16"
-                                       FontWeight="Bold"/>
+                            <TextBlock Text="游戏路径" FontSize="16" FontWeight="Bold"/>
                             <TextBlock Text="默认扫描所有盘符下的 X:\JX3，并自动定位 userdata。"
-                                       Margin="0,4,0,10"
-                                       Foreground="{StaticResource SubtleTextBrush}"
+                                       Margin="0,3,0,8"
+                                       Foreground="{StaticResource MutedBrush}"
                                        FontSize="12"/>
                             <TextBox Text="{Binding GamePath, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
@@ -497,135 +457,104 @@
                     </Grid>
                 </Border>
 
-                <Border Grid.Row="1"
-                        Margin="0,16,0,0"
-                        Style="{StaticResource GlassBorder}">
+                <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,14">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <DockPanel>
-                            <TextBlock Text="角色列表"
-                                       FontSize="16"
-                                       FontWeight="Bold"/>
+                        <DockPanel Margin="0,0,0,10">
+                            <TextBlock Text="角色列表" FontSize="16" FontWeight="Bold"/>
                             <TextBlock DockPanel.Dock="Right"
                                        Text="{Binding Characters.Count, StringFormat={}{0} 个角色}"
                                        Foreground="{StaticResource MutedBrush}"/>
                         </DockPanel>
                         <Border Grid.Row="1"
-                                Margin="0,12,0,0"
-                                Background="{StaticResource GlassInputBrush}"
-                                BorderBrush="{StaticResource GlassBorderBrush}"
+                                Background="{StaticResource InputBrush}"
+                                BorderBrush="{StaticResource LineBrush}"
                                 BorderThickness="1"
-                                CornerRadius="18"
-                                Padding="6">
+                                CornerRadius="8">
                             <DataGrid ItemsSource="{Binding Characters}"
                                       SelectedItem="{Binding SelectedCharacter}"
                                       AutoGenerateColumns="False"
                                       IsReadOnly="True"
                                       SelectionMode="Single">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="账号" Binding="{Binding Account}" Width="*"/>
-                                    <DataGridTextColumn Header="区服" Binding="{Binding Server}" Width="*"/>
-                                    <DataGridTextColumn Header="角色" Binding="{Binding CharacterName}" Width="*"/>
-                                    <DataGridTextColumn Header="dump" Binding="{Binding DumpFiles.Count}" Width="72"/>
+                                    <DataGridTextColumn Header="账号" Binding="{Binding Account}" Width="1.2*"/>
+                                    <DataGridTextColumn Header="区服" Binding="{Binding Server}" Width="1.4*"/>
+                                    <DataGridTextColumn Header="角色" Binding="{Binding CharacterName}" Width="1.2*"/>
+                                    <DataGridTextColumn Header="dump" Binding="{Binding DumpFiles.Count}" Width="68"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Border>
                     </Grid>
                 </Border>
 
-                <DockPanel Grid.Row="2"
-                           Margin="0,16,0,8">
-                    <TextBlock Text="保存档 Slot 01-99"
-                               FontSize="16"
-                               FontWeight="Bold"/>
-                    <TextBlock DockPanel.Dock="Right"
-                               Text="每个用户独立 99 个保存档"
-                               Foreground="{StaticResource SubtleTextBrush}"
-                               FontSize="12"/>
-                </DockPanel>
-
-                <Border Grid.Row="3"
-                        Style="{StaticResource GlassBorder}"
-                        Padding="10">
-                    <ListBox ItemsSource="{Binding Slots}"
-                             SelectedItem="{Binding SelectedSlot}"
-                             ScrollViewer.VerticalScrollBarVisibility="Auto">
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel/>
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Border Width="88"
-                                        Height="62"
-                                        Background="{StaticResource GlassInputBrush}"
-                                        BorderBrush="{StaticResource GlassBorderBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="18"
-                                        Padding="9">
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding NumberText}"
-                                                   FontWeight="Bold"/>
-                                        <TextBlock Text="{Binding KindText}"
-                                                   FontSize="11"
-                                                   Foreground="{StaticResource MutedBrush}"/>
-                                        <TextBlock Text="{Binding Name}"
-                                                   FontSize="10"
-                                                   Foreground="{StaticResource SubtleTextBrush}"
-                                                   TextTrimming="CharacterEllipsis"/>
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+                <Border Grid.Row="2" Style="{StaticResource Card}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <DockPanel Margin="0,0,0,10">
+                            <TextBlock Text="保存档 Slot 01-99" FontSize="16" FontWeight="Bold"/>
+                            <TextBlock DockPanel.Dock="Right"
+                                       Text="每个用户独立 99 个保存档"
+                                       Foreground="{StaticResource MutedBrush}"
+                                       FontSize="12"/>
+                        </DockPanel>
+                        <ListBox Grid.Row="1"
+                                 ItemsSource="{Binding Slots}"
+                                 SelectedItem="{Binding SelectedSlot}"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Width="92"
+                                            Height="62"
+                                            Background="{StaticResource InputBrush}"
+                                            BorderBrush="{StaticResource LineBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="8"
+                                            Padding="10">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding NumberText}" FontWeight="Bold"/>
+                                            <TextBlock Text="{Binding KindText}" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
+                                            <TextBlock Text="{Binding Name}" FontSize="10" Foreground="{StaticResource SubtleBrush}" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
                 </Border>
             </Grid>
 
-            <Grid Grid.Row="1"
-                  Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
-                <Border Style="{StaticResource GlassBorder}">
+            <Border Grid.Column="2" Style="{StaticResource Card}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <TextBlock Text="备份 / 恢复"
-                                   FontSize="16"
-                                   FontWeight="Bold"/>
+                        <TextBlock Text="备份 / 恢复" FontSize="16" FontWeight="Bold"/>
 
-                        <TextBlock Text="保存档名称"
-                                   Margin="0,14,0,6"
-                                   Foreground="{StaticResource MutedBrush}"/>
+                        <TextBlock Text="保存档名称" Margin="0,14,0,6" Foreground="{StaticResource MutedBrush}"/>
                         <TextBox Text="{Binding SlotNameDraft, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <TextBlock Text="保存档类型"
-                                   Margin="0,12,0,6"
-                                   Foreground="{StaticResource MutedBrush}"/>
-                        <ComboBox ItemsSource="{Binding SaveKinds}"
-                                  SelectedItem="{Binding SelectedSaveKind}"/>
+                        <TextBlock Text="保存档类型" Margin="0,12,0,6" Foreground="{StaticResource MutedBrush}"/>
+                        <ComboBox ItemsSource="{Binding SaveKinds}" SelectedItem="{Binding SelectedSaveKind}"/>
 
-                        <TextBlock Text="门派/心法标签"
-                                   Margin="0,12,0,6"
-                                   Foreground="{StaticResource MutedBrush}"/>
+                        <TextBlock Text="门派/心法标签" Margin="0,12,0,6" Foreground="{StaticResource MutedBrush}"/>
                         <TextBox Text="{Binding SectTagDraft, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <TextBlock Text="备注"
-                                   Margin="0,12,0,6"
-                                   Foreground="{StaticResource MutedBrush}"/>
+                        <TextBlock Text="备注" Margin="0,12,0,6" Foreground="{StaticResource MutedBrush}"/>
                         <TextBox Text="{Binding NoteDraft, UpdateSourceTrigger=PropertyChanged}"
-                                 MinHeight="58"
+                                 MinHeight="62"
                                  TextWrapping="Wrap"
                                  AcceptsReturn="True"/>
 
-                        <TextBlock Text="模块选择"
-                                   Margin="0,14,0,8"
-                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="模块选择" Margin="0,14,0,8" FontWeight="SemiBold"/>
                         <ItemsControl ItemsSource="{Binding ModuleChoices}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -646,7 +575,7 @@
                                             </TextBlock>
                                             <TextBlock Text="{Binding Description}"
                                                        FontSize="11"
-                                                       Foreground="{StaticResource SubtleTextBrush}"
+                                                       Foreground="{StaticResource MutedBrush}"
                                                        TextWrapping="Wrap"/>
                                         </StackPanel>
                                     </CheckBox>
@@ -654,108 +583,92 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
-                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                        <Grid Margin="0,14,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
                             <Button Content="创建备份"
                                     Command="{Binding CreateBackupCommand}"
                                     Style="{StaticResource PrimaryButton}"
-                                    Margin="0,0,10,0"/>
-                            <Button Content="恢复到角色"
+                                    Margin="0,0,6,0"/>
+                            <Button Grid.Column="1"
+                                    Content="恢复到角色"
                                     Command="{Binding RestoreBackupCommand}"
-                                    Style="{StaticResource DangerButton}"/>
-                        </StackPanel>
-                    </StackPanel>
-                </Border>
+                                    Style="{StaticResource DangerButton}"
+                                    Margin="6,0,0,0"/>
+                        </Grid>
 
-                <Border Grid.Row="1"
-                        Margin="0,16,0,0"
-                        Style="{StaticResource GlassBorder}">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <TextBlock Text="备份版本"
-                                   FontSize="16"
-                                   FontWeight="Bold"/>
-                        <ListBox Grid.Row="1"
-                                 Margin="0,12,0,0"
-                                 ItemsSource="{Binding RecentBackups}"
-                                 SelectedItem="{Binding SelectedBackup}">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Padding="10"
-                                            Background="{StaticResource GlassInputBrush}"
-                                            BorderBrush="{StaticResource GlassBorderBrush}"
-                                            BorderThickness="1"
-                                            CornerRadius="18">
-                                        <StackPanel>
-                                            <TextBlock Text="{Binding PackagePath}"
-                                                       FontSize="11"
-                                                       TextTrimming="CharacterEllipsis"/>
-                                            <TextBlock Text="{Binding ModuleSummary}"
-                                                       Foreground="{StaticResource MutedBrush}"
-                                                       FontSize="11"/>
-                                            <TextBlock Text="{Binding CreatedAt}"
-                                                       Foreground="{StaticResource SubtleTextBrush}"
-                                                       FontSize="10"/>
-                                        </StackPanel>
-                                    </Border>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                        <Border Grid.Row="2"
-                                Margin="0,10,0,0"
-                                Padding="12"
-                                Background="#55223A4F"
-                                BorderBrush="#668AC7FF"
-                                BorderThickness="1"
-                                CornerRadius="18">
-                            <TextBlock Text="{Binding RiskSummary}"
-                                       TextWrapping="Wrap"
-                                       Foreground="#D9E5F7"/>
+                        <Border Style="{StaticResource SmallCard}" Margin="0,16,0,0">
+                            <StackPanel>
+                                <TextBlock Text="备份版本" FontWeight="Bold"/>
+                                <ListBox Margin="0,8,0,0"
+                                         MaxHeight="160"
+                                         ItemsSource="{Binding RecentBackups}"
+                                         SelectedItem="{Binding SelectedBackup}">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding PackagePath}" FontSize="11" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding ModuleSummary}" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
+                                                <TextBlock Text="{Binding CreatedAt}" FontSize="10" Foreground="{StaticResource SubtleBrush}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                                <Border Margin="0,10,0,0"
+                                        Padding="10"
+                                        Background="#132235"
+                                        BorderBrush="{StaticResource LineBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="8">
+                                    <TextBlock Text="{Binding RiskSummary}" TextWrapping="Wrap" Foreground="#C7D2E5"/>
+                                </Border>
+                            </StackPanel>
                         </Border>
-                    </Grid>
-                </Border>
 
-                <Border Grid.Row="2"
-                        Margin="0,16,0,0"
-                        Style="{StaticResource GlassBorder}">
-                    <StackPanel>
-                        <TextBlock Text="同步与便携数据"
-                                   FontSize="16"
-                                   FontWeight="Bold"/>
-                        <TextBlock Text="同步文件夹"
-                                   Margin="0,12,0,6"
-                                   Foreground="{StaticResource MutedBrush}"/>
-                        <TextBox Text="{Binding SyncFolder, UpdateSourceTrigger=PropertyChanged}"/>
-                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                            <Button Content="选择同步目录"
-                                    Command="{Binding ChooseSyncFolderCommand}"
-                                    Margin="0,0,8,0"/>
-                            <Button Content="同步所选备份"
-                                    Command="{Binding SyncSelectedBackupCommand}"/>
-                        </StackPanel>
-                        <Button Content="打开 data 目录"
-                                Margin="0,10,0,0"
-                                Command="{Binding OpenDataFolderCommand}"/>
-                        <TextBlock Text="{Binding DataDirectory}"
-                                   Margin="0,8,0,0"
-                                   FontSize="11"
-                                   Foreground="{StaticResource SubtleTextBrush}"
-                                   TextWrapping="Wrap"/>
+                        <Border Style="{StaticResource SmallCard}" Margin="0,16,0,0">
+                            <StackPanel>
+                                <TextBlock Text="同步与便携数据" FontWeight="Bold"/>
+                                <TextBlock Text="同步文件夹" Margin="0,10,0,6" Foreground="{StaticResource MutedBrush}"/>
+                                <TextBox Text="{Binding SyncFolder, UpdateSourceTrigger=PropertyChanged}"/>
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Content="选择目录"
+                                            Command="{Binding ChooseSyncFolderCommand}"
+                                            Margin="0,0,6,0"/>
+                                    <Button Grid.Column="1"
+                                            Content="同步备份"
+                                            Command="{Binding SyncSelectedBackupCommand}"
+                                            Margin="6,0,0,0"/>
+                                </Grid>
+                                <Button Content="打开 data 目录"
+                                        Margin="0,10,0,0"
+                                        Command="{Binding OpenDataFolderCommand}"/>
+                                <TextBlock Text="{Binding DataDirectory}"
+                                           Margin="0,8,0,0"
+                                           FontSize="11"
+                                           Foreground="{StaticResource SubtleBrush}"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
-                </Border>
-            </Grid>
-
-            <Border Grid.Row="2"
-                    Grid.ColumnSpan="3"
-                    Margin="0,16,0,0"
-                    Style="{StaticResource MiniGlassBorder}">
-                <TextBlock Text="提示：通用档默认不勾选宏、技能/动作按钮、完整 dump。只有手动勾选高风险模块时，才可能覆盖技能栏摆放或宏。"
-                           Foreground="{StaticResource MutedBrush}"
-                           TextWrapping="Wrap"/>
+                </ScrollViewer>
             </Border>
         </Grid>
+
+        <Border Grid.Row="2"
+                Background="{StaticResource PanelBrush}"
+                BorderBrush="{StaticResource LineBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="12,8">
+            <TextBlock Text="提示：通用档默认不勾选宏、技能/动作按钮、完整 dump。只有手动勾选高风险模块时，才可能覆盖技能栏摆放或宏。"
+                       Foreground="{StaticResource MutedBrush}"
+                       TextWrapping="Wrap"/>
+        </Border>
     </Grid>
 </Window>
