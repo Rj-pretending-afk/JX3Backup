@@ -26,7 +26,9 @@ public partial class App : Application
             var scanner = new GameScanner();
             var classifier = new ConfigClassifier();
             var processGuard = new GameProcessGuard();
-            var backupService = new BackupService(paths, repository, classifier, processGuard);
+            var cndkLuaFile = new CndkLuaFile();
+            var skillPlacementService = new SkillPlacementService(cndkLuaFile);
+            var backupService = new BackupService(paths, repository, classifier, processGuard, skillPlacementService);
             var syncService = new SyncService(repository);
             var viewModel = new MainViewModel(paths, settings, repository, scanner, classifier, backupService, syncService);
             viewModel.Initialize();

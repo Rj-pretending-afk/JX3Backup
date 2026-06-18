@@ -23,8 +23,8 @@ public sealed class ConfigClassifier
             new(ConfigModule.KeyBindings, "快捷键/键位", "键位相关配置；不会主动包含技能栏摆放", true, false),
             new(ConfigModule.DisplayChatAddon, "显示/聊天/插件", "画质、聊天、插件等通用设置", true, false),
             new(ConfigModule.Macros, "宏", "高风险：可能覆盖宏", fullSelected && !safeSelected, true),
-            new(ConfigModule.ActionButtons, "技能/动作按钮", "高风险：可能覆盖技能摆放和动作栏", fullSelected && !safeSelected, true),
-            new(ConfigModule.FullDump, "完整 dump", "高风险：userpreferences/*.dump 可能包含动作栏/宏", fullSelected && !safeSelected, true)
+            new(ConfigModule.ActionButtons, "技能/动作按钮", "高风险：可独立备份 ActionBar 技能摆放", fullSelected && !safeSelected, true),
+            new(ConfigModule.FullDump, "完整 dump", "高风险：完整 userpreferences 配置可能包含动作栏/宏", fullSelected && !safeSelected, true)
         };
     }
 
@@ -32,6 +32,11 @@ public sealed class ConfigClassifier
     {
         var normalized = relativePath.Replace('\\', '/').ToLowerInvariant();
         var fileName = Path.GetFileName(normalized);
+        if (fileName is "userpreferences.jx3dat" or "userpreferencesasync.jx3dat")
+        {
+            return ConfigModule.FullDump;
+        }
+
         if ((normalized.Contains("/userpreferences/") || normalized.StartsWith("userpreferences/"))
             && fileName.EndsWith(".dump", StringComparison.OrdinalIgnoreCase))
         {

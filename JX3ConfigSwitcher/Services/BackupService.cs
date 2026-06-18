@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using JX3ConfigSwitcher.Models;
 
@@ -11,22 +12,27 @@ namespace JX3ConfigSwitcher.Services;
 
 public sealed class BackupService
 {
+    private const string SkillPlacementEntryPath = "special/skill-placement.json";
+
     private readonly PortablePaths _paths;
     private readonly ProfileRepository _repository;
     private readonly ConfigClassifier _classifier;
     private readonly GameProcessGuard _processGuard;
+    private readonly SkillPlacementService _skillPlacementService;
     private readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
 
     public BackupService(
         PortablePaths paths,
         ProfileRepository repository,
         ConfigClassifier classifier,
-        GameProcessGuard processGuard)
+        GameProcessGuard processGuard,
+        SkillPlacementService skillPlacementService)
     {
         _paths = paths;
         _repository = repository;
         _classifier = classifier;
         _processGuard = processGuard;
+        _skillPlacementService = skillPlacementService;
     }
 
     public BackupVersionRecord CreateBackup(
@@ -91,7 +97,7 @@ public sealed class BackupService
         var modules = selectedModules.Distinct().ToHashSet();
         using var archive = ZipFile.OpenRead(packagePath);
         var manifest = ReadManifest(archive);
-        foreach (var file in manifest.Files.Where(file => modules.Contains(file.Module)))
+        foreach (var file in manifest.Files.Where(file => modules.Contains(file.Module) && !file.RelativePath.StartsWith("special/", StringComparison.OrdinalIgnoreCase)))
         {
             var entry = archive.GetEntry("files/" + file.RelativePath.Replace('\\', '/'));
             if (entry is null)
@@ -107,6 +113,15 @@ public sealed class BackupService
 
             Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
             entry.ExtractToFile(destination, overwrite: true);
+        }
+
+        if (modules.Contains(ConfigModule.ActionButtons))
+        {
+            var entry = archive.GetEntry(SkillPlacementEntryPath)
+                ?? throw new InvalidDataException("备份包不包含独立技能摆放快照，无法只恢复技能/动作按钮。");
+            using var reader = new StreamReader(entry.Open(), Encoding.UTF8);
+            var snapshot = _skillPlacementService.Deserialize(reader.ReadToEnd());
+            _skillPlacementService.RestoreToCharacter(target.CharacterPath, snapshot);
         }
 
         _repository.AddLog("Info", $"恢复备份到：{target.DisplayName}");
@@ -125,7 +140,7 @@ public sealed class BackupService
         var selectedFiles = manifest.Files.Where(file => modules.Contains(file.Module)).ToList();
         var highRisk = selectedFiles.Where(file => file.IsHighRisk).Select(file => file.Module).Distinct().Select(GetModuleName);
         var dumpCount = selectedFiles.Count(file => file.Module == ConfigModule.FullDump);
-        return $"将写入 {selectedFiles.Count} 个文件；高风险模块：{string.Join(", ", highRisk.DefaultIfEmpty("无"))}；dump 文件：{dumpCount}";
+        return $"将写入 {selectedFiles.Count} 个项目；高风险模块：{string.Join(", ", highRisk.DefaultIfEmpty("无"))}；dump 文件：{dumpCount}";
     }
 
     public static string GetModuleName(ConfigModule module)
@@ -182,6 +197,32 @@ public sealed class BackupService
                     _classifier.IsHighRisk(module)));
             }
 
+            if (modules.Contains(ConfigModule.ActionButtons))
+            {
+                try
+                {
+                    var snapshot = _skillPlacementService.ExtractFromCharacter(sourcePath);
+                    var json = _skillPlacementService.Serialize(snapshot);
+                    var bytes = Encoding.UTF8.GetBytes(json);
+                    var skillEntry = archive.CreateEntry(SkillPlacementEntryPath, CompressionLevel.Optimal);
+                    using (var stream = skillEntry.Open())
+                    {
+                        stream.Write(bytes, 0, bytes.Length);
+                    }
+
+                    entries.Add(new BackupFileEntry(
+                        SkillPlacementEntryPath,
+                        bytes.Length,
+                        ComputeSha256(bytes),
+                        ConfigModule.ActionButtons,
+                        true));
+                }
+                catch (Exception) when (kind is SaveKind.AutoSnapshot)
+                {
+                    _repository.AddLog("Warn", "自动快照未能抽取独立技能摆放；已继续保存其它配置。");
+                }
+            }
+
             var manifest = new BackupManifest(
                 "剑3备份器",
                 typeof(BackupService).Assembly.GetName().Version?.ToString() ?? "0.1.0",
@@ -235,6 +276,12 @@ public sealed class BackupService
         using var sha = SHA256.Create();
         using var stream = File.OpenRead(file);
         return Convert.ToHexString(sha.ComputeHash(stream));
+    }
+
+    private static string ComputeSha256(byte[] bytes)
+    {
+        using var sha = SHA256.Create();
+        return Convert.ToHexString(sha.ComputeHash(bytes));
     }
 
     private static string MakeSafeName(string value)
