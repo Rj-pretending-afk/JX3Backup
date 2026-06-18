@@ -1,0 +1,39 @@
+# Build outputs
+**/bin/
+**/obj/
+**/publish/
+**/publish-*/
+publish*/
+dist/
+artifacts/
+TestResults/
+
+# Portable app runtime data - may contain local paths, role names, backups, logs
+**/data/
+**/backups/
+**/snapshots/
+**/logs/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.zip
+*.7z
+*.rar
+
+# JX3/user configuration dumps and accidental game data
+*.dump
+*.jx3dat
+userdata/
+**/userdata/
+
+# IDE/user files
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local unrelated workspace folder
+挂机/
