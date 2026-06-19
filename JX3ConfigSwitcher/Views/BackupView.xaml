@@ -35,11 +35,11 @@
             <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Padding" Value="16"/>
+            <Setter Property="Padding" Value="14"/>
         </Style>
 
         <Style x:Key="SectionTitle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontSize" Value="17"/>
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
 
@@ -311,7 +311,7 @@
             <Setter Property="ColumnHeaderHeight" Value="38"/>
             <Setter Property="RowBackground" Value="Transparent"/>
             <Setter Property="AlternatingRowBackground" Value="#101821"/>
-            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
         </Style>
 
         <Style TargetType="DataGridColumnHeader">
@@ -391,47 +391,22 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Background="{StaticResource AppBackground}" Margin="16">
+    <Grid Background="Transparent" Margin="0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" Style="{StaticResource Card}" Padding="18,12" Margin="0,0,0,14">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="420"/>
-                </Grid.ColumnDefinitions>
-                <StackPanel>
-                    <TextBlock Text="剑3备份器" FontSize="30" FontWeight="Bold"/>
-                    <TextBlock Text="便携式键位、界面与角色配置备份切换"
-                               Margin="0,2,0,0"
-                               Style="{StaticResource MutedText}"/>
-                </StackPanel>
-                <Border Grid.Column="1"
-                        Background="{StaticResource InputBrush}"
-                        BorderBrush="{StaticResource LineBrush}"
-                        BorderThickness="1"
-                        CornerRadius="8"
-                        Padding="12,8"
-                        VerticalAlignment="Center">
-                    <TextBlock Text="{Binding StatusMessage}" TextTrimming="CharacterEllipsis"/>
-                </Border>
-            </Grid>
-        </Border>
-
-        <TabControl Grid.Row="1" Margin="0,0,0,14">
+        <TabControl Grid.Row="0" Margin="0,0,0,10">
             <TabItem Header="备份 / 历史">
         <Grid Margin="0,8,0,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="220"/>
+                <ColumnDefinition Width="190"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="380"/>
+                <ColumnDefinition Width="340"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,14,0">
+            <Border Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,10,0">
                 <DockPanel LastChildFill="True">
                     <StackPanel DockPanel.Dock="Top">
                         <TextBlock Text="用户 Profile" Style="{StaticResource SectionTitle}"/>
@@ -446,7 +421,7 @@
                 </DockPanel>
             </Border>
 
-            <Grid Grid.Column="1" Margin="0,0,14,0">
+            <Grid Grid.Column="1" Margin="0,0,10,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="1.25*"/>
@@ -511,13 +486,13 @@
                                       IsReadOnly="True"
                                       SelectionMode="Single">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="账号" Binding="{Binding Account}" Width="1.15*"/>
-                                    <DataGridTextColumn Header="区服" Binding="{Binding Server}" Width="1.45*"/>
-                                    <DataGridTextColumn Header="角色" Binding="{Binding CharacterName}" Width="1.15*"/>
-                                    <DataGridTextColumn Header="门派" Binding="{Binding Sect}" Width="0.85*"/>
-                                    <DataGridTextColumn Header="心法" Binding="{Binding Kungfu}" Width="1.05*"/>
-                                    <DataGridTextColumn Header="装分" Binding="{Binding EquipmentScore}" Width="72"/>
-                                    <DataGridTextColumn Header="dump" Binding="{Binding DumpFiles.Count}" Width="72"/>
+                                    <DataGridTextColumn Header="账号" Binding="{Binding Account}" Width="0.9*"/>
+                                    <DataGridTextColumn Header="区服" Binding="{Binding Server}" Width="1.1*"/>
+                                    <DataGridTextColumn Header="角色" Binding="{Binding CharacterName}" Width="1*"/>
+                                    <DataGridTextColumn Header="门派" Binding="{Binding Sect}" Width="0.75*"/>
+                                    <DataGridTextColumn Header="心法" Binding="{Binding Kungfu}" Width="0.9*"/>
+                                    <DataGridTextColumn Header="装分" Binding="{Binding EquipmentScore}" Width="58"/>
+                                    <DataGridTextColumn Header="dump" Binding="{Binding DumpFiles.Count}" Width="58"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Border>
@@ -747,11 +722,11 @@
             <TabItem Header="跨角色覆盖">
                 <Grid Margin="0,8,0,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="360"/>
+                        <ColumnDefinition Width="300"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Border Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,14,0">
+                    <Border Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,10,0">
                         <DockPanel LastChildFill="True">
                             <StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
                                 <TextBlock Text="可拖拽保存档" Style="{StaticResource SectionTitle}"/>
@@ -899,7 +874,7 @@
             </TabItem>
         </TabControl>
 
-        <Border Grid.Row="2"
+        <Border Grid.Row="1"
                 Background="{StaticResource PanelBrush}"
                 BorderBrush="{StaticResource LineBrush}"
                 BorderThickness="1"
