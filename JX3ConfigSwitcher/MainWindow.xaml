@@ -1,14 +1,11 @@
 <Window x:Class="JX3ConfigSwitcher.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d"
         Title="剑3备份器"
-        Width="1280"
-        Height="820"
-        MinWidth="1120"
-        MinHeight="720"
+        Width="1320"
+        Height="860"
+        MinWidth="1180"
+        MinHeight="760"
         Background="#0F141B"
         Foreground="#E8EEF8"
         FontFamily="Microsoft YaHei UI, Segoe UI, Arial"
@@ -23,19 +20,16 @@
         <SolidColorBrush x:Key="LineBrush" Color="#2B3544"/>
         <SolidColorBrush x:Key="LineStrongBrush" Color="#3B4960"/>
         <SolidColorBrush x:Key="AccentBrush" Color="#2F80ED"/>
-        <SolidColorBrush x:Key="AccentHoverBrush" Color="#3D8EFF"/>
         <SolidColorBrush x:Key="AccentSoftBrush" Color="#183B62"/>
         <SolidColorBrush x:Key="DangerBrush" Color="#F05D6A"/>
         <SolidColorBrush x:Key="DangerSoftBrush" Color="#4A1E28"/>
         <SolidColorBrush x:Key="TextBrush" Color="#E8EEF8"/>
         <SolidColorBrush x:Key="MutedBrush" Color="#99A6BA"/>
         <SolidColorBrush x:Key="SubtleBrush" Color="#6F7D91"/>
-
-        <DropShadowEffect x:Key="PanelShadow"
-                          BlurRadius="12"
-                          ShadowDepth="2"
-                          Opacity="0.16"
-                          Color="#000000"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#183B62"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#E8EEF8"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#183B62"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="#E8EEF8"/>
 
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
@@ -48,12 +42,16 @@
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="8"/>
             <Setter Property="Padding" Value="16"/>
-            <Setter Property="Effect" Value="{StaticResource PanelShadow}"/>
         </Style>
 
-        <Style x:Key="SmallCard" TargetType="Border" BasedOn="{StaticResource Card}">
-            <Setter Property="Padding" Value="12"/>
-            <Setter Property="Effect" Value="{x:Null}"/>
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+
+        <Style x:Key="MutedText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
 
         <Style TargetType="Button">
@@ -62,7 +60,7 @@
             <Setter Property="BorderBrush" Value="{StaticResource LineStrongBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="12,8"/>
-            <Setter Property="MinHeight" Value="36"/>
+            <Setter Property="MinHeight" Value="38"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
@@ -80,9 +78,6 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Root" Property="Background" Value="#223047"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="#182130"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="Root" Property="Opacity" Value="0.45"/>
@@ -119,15 +114,14 @@
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="8">
-                            <ScrollViewer x:Name="PART_ContentHost"
-                                          Margin="{TemplateBinding Padding}"/>
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="{StaticResource InputHoverBrush}"/>
-                            </Trigger>
                             <Trigger Property="IsKeyboardFocused" Value="True">
                                 <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="{StaticResource InputHoverBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -141,6 +135,71 @@
             <Setter Property="BorderBrush" Value="{StaticResource LineStrongBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="MinHeight" Value="38"/>
+            <Setter Property="Padding" Value="8,4"/>
+        </Style>
+
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="Background" Value="{StaticResource PanelBrush}"/>
+            <Setter Property="Padding" Value="10,7"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource InputHoverBrush}"/>
+                    <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AccentSoftBrush}"/>
+                    <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SectComboBoxItemStyle" TargetType="ComboBoxItem">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="Background" Value="{StaticResource PanelBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="Root"
+                                Margin="4,3"
+                                Padding="10,8"
+                                Background="{Binding Color}"
+                                BorderBrush="{StaticResource LineBrush}"
+                                BorderThickness="1"
+                                CornerRadius="6">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="4"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Background="{Binding ContrastText}" CornerRadius="4" Opacity="0.5"/>
+                                <TextBlock Grid.Column="2"
+                                           Text="{Binding DisplayName}"
+                                           Foreground="{Binding ContrastText}"
+                                           FontWeight="SemiBold"
+                                           TextTrimming="CharacterEllipsis"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="BorderBrush" Value="#FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Root" Property="BorderBrush" Value="#FFFFFF"/>
+                                <Setter TargetName="Root" Property="BorderThickness" Value="2"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SectComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="MinHeight" Value="38"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="ItemContainerStyle" Value="{StaticResource SectComboBoxItemStyle}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ComboBox">
@@ -148,33 +207,35 @@
                             <ToggleButton x:Name="Toggle"
                                           Focusable="False"
                                           ClickMode="Press"
-                                          Background="{TemplateBinding Background}"
-                                          BorderBrush="{TemplateBinding BorderBrush}"
-                                          BorderThickness="{TemplateBinding BorderThickness}"
                                           IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
                                 <ToggleButton.Template>
                                     <ControlTemplate TargetType="ToggleButton">
-                                        <Border x:Name="Root"
-                                                Background="{TemplateBinding Background}"
-                                                BorderBrush="{TemplateBinding BorderBrush}"
-                                                BorderThickness="{TemplateBinding BorderThickness}"
-                                                CornerRadius="8">
-                                            <Grid Margin="12,0">
-                                                <ContentPresenter Content="{Binding SelectionBoxItem, RelativeSource={RelativeSource AncestorType=ComboBox}}"
-                                                                  HorizontalAlignment="Left"
-                                                                  VerticalAlignment="Center"/>
-                                                <Path Data="M 0 0 L 5 5 L 10 0"
-                                                      HorizontalAlignment="Right"
-                                                      VerticalAlignment="Center"
-                                                      Stroke="#C7D2E5"
-                                                      StrokeThickness="2"
-                                                      StrokeStartLineCap="Round"
-                                                      StrokeEndLineCap="Round"/>
+                                        <Border x:Name="SelectionRoot"
+                                                MinHeight="38"
+                                                Background="{Binding SelectedItem.Color, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                                                BorderBrush="{StaticResource LineStrongBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="8"
+                                                Padding="12,8">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="24"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding SelectedItem.DisplayName, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                                                           Foreground="{Binding SelectedItem.ContrastText, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                                                           FontWeight="SemiBold"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Grid.Column="1"
+                                                           Text="v"
+                                                           HorizontalAlignment="Center"
+                                                           Foreground="{Binding SelectedItem.ContrastText, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                                                           FontWeight="Bold"/>
                                             </Grid>
                                         </Border>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="Root" Property="Background" Value="{StaticResource InputHoverBrush}"/>
+                                                <Setter TargetName="SelectionRoot" Property="BorderBrush" Value="#FFFFFF"/>
                                             </Trigger>
                                         </ControlTemplate.Triggers>
                                     </ControlTemplate>
@@ -182,17 +243,18 @@
                             </ToggleButton>
                             <Popup x:Name="PART_Popup"
                                    Placement="Bottom"
-                                   IsOpen="{TemplateBinding IsDropDownOpen}"
                                    AllowsTransparency="True"
+                                   Focusable="False"
                                    PopupAnimation="Fade"
-                                   MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
-                                <Border Margin="0,6,0,0"
-                                        Background="#151B24"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}">
+                                <Border MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                        MaxHeight="340"
+                                        Background="{StaticResource PanelBrush}"
                                         BorderBrush="{StaticResource LineStrongBrush}"
                                         BorderThickness="1"
                                         CornerRadius="8"
                                         Padding="4">
-                                    <ScrollViewer MaxHeight="220">
+                                    <ScrollViewer CanContentScroll="True">
                                         <ItemsPresenter/>
                                     </ScrollViewer>
                                 </Border>
@@ -203,83 +265,23 @@
             </Setter>
         </Style>
 
-        <Style TargetType="ComboBoxItem">
-            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
-            <Setter Property="Padding" Value="10,7"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ComboBoxItem">
-                        <Border x:Name="Root"
-                                Background="Transparent"
-                                CornerRadius="6"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsHighlighted" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="{StaticResource AccentSoftBrush}"/>
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="{StaticResource AccentSoftBrush}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
         <Style TargetType="CheckBox">
             <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="CheckBox">
-                        <Grid Margin="0,5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="28"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Border x:Name="Box"
-                                    Width="18"
-                                    Height="18"
-                                    CornerRadius="6"
-                                    Background="{StaticResource InputBrush}"
-                                    BorderBrush="{StaticResource LineStrongBrush}"
-                                    BorderThickness="1"
-                                    VerticalAlignment="Top"/>
-                            <Path x:Name="CheckMark"
-                                  Data="M 4 9 L 8 13 L 15 5"
-                                  Stroke="#FFFFFF"
-                                  StrokeThickness="2.2"
-                                  StrokeStartLineCap="Round"
-                                  StrokeEndLineCap="Round"
-                                  Visibility="Collapsed"/>
-                            <ContentPresenter Grid.Column="1"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
-                            </Trigger>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Box" Property="Background" Value="{StaticResource AccentBrush}"/>
-                                <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource AccentHoverBrush}"/>
-                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="Margin" Value="0,5"/>
         </Style>
 
         <Style TargetType="ListBox">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
         </Style>
 
         <Style TargetType="ListBoxItem">
             <Setter Property="Margin" Value="0,2"/>
-            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ListBoxItem">
@@ -311,10 +313,11 @@
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="GridLinesVisibility" Value="None"/>
             <Setter Property="HeadersVisibility" Value="Column"/>
-            <Setter Property="RowHeight" Value="34"/>
-            <Setter Property="ColumnHeaderHeight" Value="36"/>
+            <Setter Property="RowHeight" Value="36"/>
+            <Setter Property="ColumnHeaderHeight" Value="38"/>
             <Setter Property="RowBackground" Value="Transparent"/>
             <Setter Property="AlternatingRowBackground" Value="#101821"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
         </Style>
 
         <Style TargetType="DataGridColumnHeader">
@@ -327,31 +330,12 @@
 
         <Style TargetType="DataGridRow">
             <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#182232"/>
+                    <Setter Property="Background" Value="#192333"/>
+                    <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
                 </Trigger>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="{StaticResource AccentSoftBrush}"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style TargetType="DataGridCell">
-            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="8,0"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="DataGridCell">
-                        <Border Background="{TemplateBinding Background}">
-                            <ContentPresenter VerticalAlignment="Center"
-                                              Margin="{TemplateBinding Padding}"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
                 <Trigger Property="IsSelected" Value="True">
                     <Setter Property="Background" Value="{StaticResource AccentSoftBrush}"/>
                     <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
@@ -359,21 +343,65 @@
             </Style.Triggers>
         </Style>
 
-        <Style TargetType="Slider">
-            <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
-            <Setter Property="Background" Value="{StaticResource LineBrush}"/>
+        <Style TargetType="DataGridCell">
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
 
         <DataTemplate x:Key="ProfileTemplate">
             <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
         </DataTemplate>
+
+        <Style TargetType="TabControl">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+        <Style TargetType="TabItem">
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="Background" Value="{StaticResource PanelAltBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8,8,0,0"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter ContentSource="Header"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="{StaticResource AccentSoftBrush}"/>
+                                <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
-    <Grid Background="{StaticResource AppBackground}" Margin="18">
+    <Grid Background="{StaticResource AppBackground}" Margin="16">
         <Grid.RowDefinitions>
-            <RowDefinition Height="82"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="44"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" Style="{StaticResource Card}" Padding="18,12" Margin="0,0,0,14">
@@ -382,11 +410,11 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="420"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="剑3备份器" FontSize="28" FontWeight="Bold"/>
+                <StackPanel>
+                    <TextBlock Text="剑3备份器" FontSize="30" FontWeight="Bold"/>
                     <TextBlock Text="便携式键位、界面与角色配置备份切换"
-                               Margin="0,4,0,0"
-                               Foreground="{StaticResource MutedBrush}"/>
+                               Margin="0,2,0,0"
+                               Style="{StaticResource MutedText}"/>
                 </StackPanel>
                 <Border Grid.Column="1"
                         Background="{StaticResource InputBrush}"
@@ -400,19 +428,21 @@
             </Grid>
         </Border>
 
-        <Grid Grid.Row="1" Margin="0,0,0,14">
+        <TabControl Grid.Row="1" Margin="0,0,0,14">
+            <TabItem Header="备份 / 历史">
+        <Grid Margin="0,8,0,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="240"/>
+                <ColumnDefinition Width="220"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="340"/>
+                <ColumnDefinition Width="380"/>
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,14,0">
                 <DockPanel LastChildFill="True">
                     <StackPanel DockPanel.Dock="Top">
-                        <TextBlock Text="用户 Profile" FontSize="16" FontWeight="Bold"/>
+                        <TextBlock Text="用户 Profile" Style="{StaticResource SectionTitle}"/>
                         <Button Content="+ 新建用户"
-                                Margin="0,12,0,12"
+                                Margin="0,14,0,12"
                                 Command="{Binding CreateProfileCommand}"
                                 Style="{StaticResource PrimaryButton}"/>
                     </StackPanel>
@@ -424,28 +454,33 @@
 
             <Grid Grid.Column="1" Margin="0,0,14,0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="104"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="190"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="1.25*"/>
+                    <RowDefinition Height="1*"/>
                 </Grid.RowDefinitions>
 
                 <Border Grid.Row="0" Style="{StaticResource Card}" Margin="0,0,0,14">
                     <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <StackPanel>
-                            <TextBlock Text="游戏路径" FontSize="16" FontWeight="Bold"/>
+                        <StackPanel Grid.ColumnSpan="2" Margin="0,0,0,10">
+                            <TextBlock Text="游戏路径" Style="{StaticResource SectionTitle}"/>
                             <TextBlock Text="默认扫描所有盘符下的 X:\JX3，并自动定位 userdata。"
-                                       Margin="0,3,0,8"
-                                       Foreground="{StaticResource MutedBrush}"
-                                       FontSize="12"/>
-                            <TextBox Text="{Binding GamePath, UpdateSourceTrigger=PropertyChanged}"/>
+                                       Margin="0,3,0,0"
+                                       FontSize="12"
+                                       Style="{StaticResource MutedText}"/>
                         </StackPanel>
-                        <StackPanel Grid.Column="1"
+                        <TextBox Grid.Row="1"
+                                 Text="{Binding GamePath, UpdateSourceTrigger=PropertyChanged}"
+                                 VerticalAlignment="Center"/>
+                        <StackPanel Grid.Row="1" Grid.Column="1"
                                     Orientation="Horizontal"
-                                    VerticalAlignment="Bottom"
                                     Margin="12,0,0,0">
                             <Button Content="选择"
                                     Command="{Binding ChooseGamePathCommand}"
@@ -464,10 +499,12 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <DockPanel Margin="0,0,0,10">
-                            <TextBlock Text="角色列表" FontSize="16" FontWeight="Bold"/>
-                            <TextBlock DockPanel.Dock="Right"
-                                       Text="{Binding Characters.Count, StringFormat={}{0} 个角色}"
-                                       Foreground="{StaticResource MutedBrush}"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="角色列表" Style="{StaticResource SectionTitle}"/>
+                                <TextBlock Text="{Binding Characters.Count, StringFormat={}{0} 个角色}"
+                                           Margin="6,4,0,0"
+                                           Style="{StaticResource MutedText}"/>
+                            </StackPanel>
                         </DockPanel>
                         <Border Grid.Row="1"
                                 Background="{StaticResource InputBrush}"
@@ -480,10 +517,13 @@
                                       IsReadOnly="True"
                                       SelectionMode="Single">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="账号" Binding="{Binding Account}" Width="1.2*"/>
-                                    <DataGridTextColumn Header="区服" Binding="{Binding Server}" Width="1.4*"/>
-                                    <DataGridTextColumn Header="角色" Binding="{Binding CharacterName}" Width="1.2*"/>
-                                    <DataGridTextColumn Header="dump" Binding="{Binding DumpFiles.Count}" Width="68"/>
+                                    <DataGridTextColumn Header="账号" Binding="{Binding Account}" Width="1.15*"/>
+                                    <DataGridTextColumn Header="区服" Binding="{Binding Server}" Width="1.45*"/>
+                                    <DataGridTextColumn Header="角色" Binding="{Binding CharacterName}" Width="1.15*"/>
+                                    <DataGridTextColumn Header="门派" Binding="{Binding Sect}" Width="0.85*"/>
+                                    <DataGridTextColumn Header="心法" Binding="{Binding Kungfu}" Width="1.05*"/>
+                                    <DataGridTextColumn Header="装分" Binding="{Binding EquipmentScore}" Width="72"/>
+                                    <DataGridTextColumn Header="dump" Binding="{Binding DumpFiles.Count}" Width="72"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Border>
@@ -496,17 +536,17 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <DockPanel Margin="0,0,0,10">
-                            <TextBlock Text="保存档 Slot 01-99" FontSize="16" FontWeight="Bold"/>
-                            <TextBlock DockPanel.Dock="Right"
-                                       Text="每个用户独立 99 个保存档"
-                                       Foreground="{StaticResource MutedBrush}"
-                                       FontSize="12"/>
-                        </DockPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="保存档 Slot 01-99" Style="{StaticResource SectionTitle}"/>
+                            <TextBlock Text=" 每个用户独立 99 个保存档"
+                                       Margin="4,4,0,0"
+                                       Style="{StaticResource MutedText}"/>
+                        </StackPanel>
                         <ListBox Grid.Row="1"
                                  ItemsSource="{Binding Slots}"
                                  SelectedItem="{Binding SelectedSlot}"
-                                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                             <ListBox.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapPanel/>
@@ -514,18 +554,35 @@
                             </ListBox.ItemsPanel>
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Width="92"
-                                            Height="62"
+                                    <Border Width="108"
+                                            Height="70"
                                             Background="{StaticResource InputBrush}"
                                             BorderBrush="{StaticResource LineBrush}"
                                             BorderThickness="1"
                                             CornerRadius="8"
                                             Padding="10">
-                                        <StackPanel>
-                                            <TextBlock Text="{Binding NumberText}" FontWeight="Bold"/>
-                                            <TextBlock Text="{Binding KindText}" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
-                                            <TextBlock Text="{Binding Name}" FontSize="10" Foreground="{StaticResource SubtleBrush}" TextTrimming="CharacterEllipsis"/>
-                                        </StackPanel>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="4"/>
+                                                <ColumnDefinition Width="8"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="28"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Background="{Binding SectColor}" CornerRadius="4"/>
+                                            <StackPanel Grid.Column="2">
+                                                <TextBlock Text="{Binding NumberText}" FontWeight="Bold"/>
+                                                <TextBlock Text="{Binding KindText}" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
+                                                <TextBlock Text="{Binding Name}" FontSize="10" Foreground="{StaticResource SubtleBrush}" TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+                                            <Button Grid.Column="3"
+                                                    Content="{Binding FavoriteText}"
+                                                    Command="{Binding DataContext.ToggleSlotFavoriteCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Padding="0"
+                                                    MinHeight="22"
+                                                    Height="22"
+                                                    Width="24"/>
+                                        </Grid>
                                     </Border>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
@@ -535,130 +592,318 @@
             </Grid>
 
             <Border Grid.Column="2" Style="{StaticResource Card}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
-                        <TextBlock Text="备份 / 恢复" FontSize="16" FontWeight="Bold"/>
-
-                        <TextBlock Text="保存档名称" Margin="0,14,0,6" Foreground="{StaticResource MutedBrush}"/>
-                        <TextBox Text="{Binding SlotNameDraft, UpdateSourceTrigger=PropertyChanged}"/>
-
-                        <TextBlock Text="保存档类型" Margin="0,12,0,6" Foreground="{StaticResource MutedBrush}"/>
-                        <ComboBox ItemsSource="{Binding SaveKinds}" SelectedItem="{Binding SelectedSaveKind}"/>
-
-                        <TextBlock Text="门派/心法标签" Margin="0,12,0,6" Foreground="{StaticResource MutedBrush}"/>
-                        <TextBox Text="{Binding SectTagDraft, UpdateSourceTrigger=PropertyChanged}"/>
-
-                        <TextBlock Text="备注" Margin="0,12,0,6" Foreground="{StaticResource MutedBrush}"/>
-                        <TextBox Text="{Binding NoteDraft, UpdateSourceTrigger=PropertyChanged}"
-                                 MinHeight="62"
-                                 TextWrapping="Wrap"
-                                 AcceptsReturn="True"/>
-
-                        <TextBlock Text="模块选择" Margin="0,14,0,8" FontWeight="SemiBold"/>
-                        <ItemsControl ItemsSource="{Binding ModuleChoices}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <CheckBox IsChecked="{Binding IsSelected}">
-                                        <StackPanel>
-                                            <TextBlock Text="{Binding Name}">
-                                                <TextBlock.Style>
-                                                    <Style TargetType="TextBlock">
-                                                        <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
-                                                        <Setter Property="FontWeight" Value="SemiBold"/>
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsHighRisk}" Value="True">
-                                                                <Setter Property="Foreground" Value="{StaticResource DangerBrush}"/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </TextBlock.Style>
-                                            </TextBlock>
-                                            <TextBlock Text="{Binding Description}"
-                                                       FontSize="11"
-                                                       Foreground="{StaticResource MutedBrush}"
-                                                       TextWrapping="Wrap"/>
-                                        </StackPanel>
-                                    </CheckBox>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <Grid Margin="0,14,0,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Button Content="创建备份"
-                                    Command="{Binding CreateBackupCommand}"
-                                    Style="{StaticResource PrimaryButton}"
-                                    Margin="0,0,6,0"/>
-                            <Button Grid.Column="1"
-                                    Content="恢复到角色"
-                                    Command="{Binding RestoreBackupCommand}"
-                                    Style="{StaticResource DangerButton}"
-                                    Margin="6,0,0,0"/>
-                        </Grid>
-
-                        <Border Style="{StaticResource SmallCard}" Margin="0,16,0,0">
-                            <StackPanel>
-                                <TextBlock Text="备份版本" FontWeight="Bold"/>
-                                <ListBox Margin="0,8,0,0"
-                                         MaxHeight="160"
-                                         ItemsSource="{Binding RecentBackups}"
-                                         SelectedItem="{Binding SelectedBackup}">
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <StackPanel>
-                                                <TextBlock Text="{Binding PackagePath}" FontSize="11" TextTrimming="CharacterEllipsis"/>
-                                                <TextBlock Text="{Binding ModuleSummary}" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
-                                                <TextBlock Text="{Binding CreatedAt}" FontSize="10" Foreground="{StaticResource SubtleBrush}"/>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                </ListBox>
-                                <Border Margin="0,10,0,0"
-                                        Padding="10"
-                                        Background="#132235"
-                                        BorderBrush="{StaticResource LineBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="8">
-                                    <TextBlock Text="{Binding RiskSummary}" TextWrapping="Wrap" Foreground="#C7D2E5"/>
-                                </Border>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Style="{StaticResource SmallCard}" Margin="0,16,0,0">
-                            <StackPanel>
-                                <TextBlock Text="同步与便携数据" FontWeight="Bold"/>
-                                <TextBlock Text="同步文件夹" Margin="0,10,0,6" Foreground="{StaticResource MutedBrush}"/>
-                                <TextBox Text="{Binding SyncFolder, UpdateSourceTrigger=PropertyChanged}"/>
-                                <Grid Margin="0,10,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Button Content="选择目录"
-                                            Command="{Binding ChooseSyncFolderCommand}"
-                                            Margin="0,0,6,0"/>
-                                    <Button Grid.Column="1"
-                                            Content="同步备份"
-                                            Command="{Binding SyncSelectedBackupCommand}"
-                                            Margin="6,0,0,0"/>
-                                </Grid>
-                                <Button Content="打开 data 目录"
-                                        Margin="0,10,0,0"
-                                        Command="{Binding OpenDataFolderCommand}"/>
-                                <TextBlock Text="{Binding DataDirectory}"
-                                           Margin="0,8,0,0"
-                                           FontSize="11"
-                                           Foreground="{StaticResource SubtleBrush}"
-                                           TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </Border>
+                <DockPanel LastChildFill="True">
+                    <StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                        <TextBlock Text="备份 / 恢复" Style="{StaticResource SectionTitle}"/>
+                        <TextBlock Text="保存档是手动长期档位，历史版本跟随当前选中的角色。"
+                                   Margin="0,4,0,0"
+                                   FontSize="12"
+                                   Style="{StaticResource MutedText}"/>
                     </StackPanel>
-                </ScrollViewer>
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel>
+                            <TextBlock Text="保存档名称" Margin="0,0,0,6" Style="{StaticResource MutedText}"/>
+                            <TextBox Text="{Binding SlotNameDraft, UpdateSourceTrigger=PropertyChanged}"/>
+
+                            <TextBlock Text="门派/心法标签" Margin="0,12,0,6" Style="{StaticResource MutedText}"/>
+                            <ComboBox ItemsSource="{Binding SectOptions}"
+                                      SelectedItem="{Binding SelectedSectOption}"
+                                      Style="{StaticResource SectComboBoxStyle}"/>
+                            <Grid Margin="0,8,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Background="{Binding SelectedSectOption.Color}" CornerRadius="4"/>
+                                <TextBlock Grid.Column="2"
+                                           Text="{Binding SectTagDraft}"
+                                           Foreground="{StaticResource MutedBrush}"
+                                           TextTrimming="CharacterEllipsis"/>
+                            </Grid>
+
+                            <TextBlock Text="备注" Margin="0,12,0,6" Style="{StaticResource MutedText}"/>
+                            <TextBox Text="{Binding NoteDraft, UpdateSourceTrigger=PropertyChanged}"
+                                     MinHeight="58"
+                                     TextWrapping="Wrap"
+                                     AcceptsReturn="True"/>
+
+                            <TextBlock Text="模块选择" Margin="0,16,0,8" FontWeight="SemiBold"/>
+                            <ItemsControl ItemsSource="{Binding ModuleChoices}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsSelected}">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Name}">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsHighRisk}" Value="True">
+                                                                    <Setter Property="Foreground" Value="{StaticResource DangerBrush}"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                                <TextBlock Text="{Binding Description}"
+                                                           FontSize="11"
+                                                           Foreground="{StaticResource MutedBrush}"
+                                                           TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                        </CheckBox>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <Grid Margin="0,16,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Content="创建备份"
+                                        Command="{Binding CreateBackupCommand}"
+                                        Style="{StaticResource PrimaryButton}"
+                                        Margin="0,0,6,0"/>
+                                <Button Grid.Column="1"
+                                        Content="恢复到角色"
+                                        Command="{Binding RestoreBackupCommand}"
+                                        Style="{StaticResource DangerButton}"
+                                        Margin="6,0,0,0"/>
+                            </Grid>
+
+                            <Border Background="{StaticResource PanelAltBrush}"
+                                    BorderBrush="{StaticResource LineBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="12"
+                                    Margin="0,16,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="当前角色历史版本" FontWeight="Bold"/>
+                                    <ListBox Margin="0,8,0,0"
+                                             MaxHeight="190"
+                                             ItemsSource="{Binding RecentBackups}"
+                                             SelectedItem="{Binding SelectedBackup}">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Kind}" FontSize="12" FontWeight="SemiBold"/>
+                                                        <TextBlock Text="{Binding SlotNumber, StringFormat=  Slot {0:00}}" FontSize="12" Foreground="{StaticResource MutedBrush}"/>
+                                                    </StackPanel>
+                                                    <TextBlock Text="{Binding ModuleSummary}" FontSize="11" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap"/>
+                                                    <TextBlock Text="{Binding CreatedAt}" FontSize="10" Foreground="{StaticResource SubtleBrush}"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                    <Border Margin="0,10,0,0"
+                                            Padding="10"
+                                            Background="#132235"
+                                            BorderBrush="{StaticResource LineBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="8">
+                                        <TextBlock Text="{Binding RiskSummary}" TextWrapping="Wrap" Foreground="#C7D2E5"/>
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="{StaticResource PanelAltBrush}"
+                                    BorderBrush="{StaticResource LineBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="12"
+                                    Margin="0,16,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="同步与便携数据" FontWeight="Bold"/>
+                                    <TextBlock Text="同步文件夹" Margin="0,10,0,6" Style="{StaticResource MutedText}"/>
+                                    <TextBox Text="{Binding SyncFolder, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <Grid Margin="0,10,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Button Content="选择目录"
+                                                Command="{Binding ChooseSyncFolderCommand}"
+                                                Margin="0,0,6,0"/>
+                                        <Button Grid.Column="1"
+                                                Content="同步备份"
+                                                Command="{Binding SyncSelectedBackupCommand}"
+                                                Margin="6,0,0,0"/>
+                                    </Grid>
+                                    <Button Content="打开 data 目录"
+                                            Margin="0,10,0,0"
+                                            Command="{Binding OpenDataFolderCommand}"/>
+                                    <TextBlock Text="{Binding DataDirectory}"
+                                               Margin="0,8,0,0"
+                                               FontSize="11"
+                                               Foreground="{StaticResource SubtleBrush}"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </DockPanel>
             </Border>
         </Grid>
+            </TabItem>
+
+            <TabItem Header="跨角色覆盖">
+                <Grid Margin="0,8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="360"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,14,0">
+                        <DockPanel LastChildFill="True">
+                            <StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                                <TextBlock Text="可拖拽保存档" Style="{StaticResource SectionTitle}"/>
+                                <TextBlock Text="同门派/心法的保存档会自动排在前面；收藏的保存档也会出现在下方。"
+                                           Margin="0,4,0,0"
+                                           FontSize="12"
+                                           Style="{StaticResource MutedText}"/>
+                            </StackPanel>
+
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                <StackPanel>
+                                    <TextBlock Text="匹配 / 全部保存档" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                    <ItemsControl ItemsSource="{Binding CoverSourceSlots}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Width="142"
+                                                        Height="88"
+                                                        Margin="0,0,10,10"
+                                                        Padding="10"
+                                                        Background="{StaticResource InputBrush}"
+                                                        BorderBrush="{StaticResource LineBrush}"
+                                                        BorderThickness="1"
+                                                        CornerRadius="8"
+                                                        MouseMove="SlotCard_MouseMove"
+                                                        PreviewMouseLeftButtonDown="SlotCard_PreviewMouseLeftButtonDown">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="4"/>
+                                                            <ColumnDefinition Width="8"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="28"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Border Grid.RowSpan="3" Background="{Binding SectColor}" CornerRadius="4"/>
+                                                        <TextBlock Grid.Column="2" Text="{Binding NumberText}" FontWeight="Bold"/>
+                                                        <Button Grid.Column="3"
+                                                                Content="{Binding FavoriteText}"
+                                                                Command="{Binding DataContext.ToggleSlotFavoriteCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                CommandParameter="{Binding}"
+                                                                Padding="0"
+                                                                MinHeight="22"
+                                                                Height="22"
+                                                                Width="24"/>
+                                                        <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2"
+                                                                   Text="{Binding Name}"
+                                                                   Foreground="{StaticResource MutedBrush}"
+                                                                   TextTrimming="CharacterEllipsis"/>
+                                                        <TextBlock Grid.Row="2" Grid.Column="2"
+                                                                   Text="{Binding MatchText}"
+                                                                   Foreground="{StaticResource AccentBrush}"
+                                                                   FontSize="11"/>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <TextBlock Text="收藏" FontWeight="SemiBold" Margin="0,14,0,8"/>
+                                    <ItemsControl ItemsSource="{Binding FavoriteSlots}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Width="142"
+                                                        Height="68"
+                                                        Margin="0,0,10,10"
+                                                        Padding="10"
+                                                        Background="{StaticResource PanelAltBrush}"
+                                                        BorderBrush="{StaticResource AccentBrush}"
+                                                        BorderThickness="1"
+                                                        CornerRadius="8"
+                                                        MouseMove="SlotCard_MouseMove"
+                                                        PreviewMouseLeftButtonDown="SlotCard_PreviewMouseLeftButtonDown">
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding NumberText}" FontWeight="Bold"/>
+                                                        <TextBlock Text="{Binding Name}" Foreground="{StaticResource MutedBrush}" TextTrimming="CharacterEllipsis"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </DockPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Style="{StaticResource Card}">
+                        <DockPanel LastChildFill="True">
+                            <StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                                <TextBlock Text="目标角色" Style="{StaticResource SectionTitle}"/>
+                                <TextBlock Text="把左侧保存档块拖到任意角色块上。覆盖前会自动备份目标角色；门派不匹配时会提示宏、技能位置和完整 dump 覆盖风险。"
+                                           Margin="0,4,0,0"
+                                           FontSize="12"
+                                           Style="{StaticResource MutedText}"/>
+                            </StackPanel>
+
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                <ItemsControl ItemsSource="{Binding Characters}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Width="260"
+                                                    Height="118"
+                                                    Margin="0,0,12,12"
+                                                    Padding="12"
+                                                    Background="{StaticResource InputBrush}"
+                                                    BorderBrush="{StaticResource LineBrush}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="8"
+                                                    AllowDrop="True"
+                                                    DragEnter="RoleCard_DragEnter"
+                                                    Drop="RoleCard_Drop"
+                                                    DragLeave="RoleCard_DragLeave"
+                                                    DragOver="RoleCard_DragOver">
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding CharacterName}" FontSize="16" FontWeight="Bold"/>
+                                                    <TextBlock Text="{Binding Server}" Foreground="{StaticResource MutedBrush}" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding SectTag}" Foreground="{StaticResource AccentBrush}" Margin="0,8,0,0" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding EquipmentScore, StringFormat=装分 {0}}" Foreground="{StaticResource SubtleBrush}" FontSize="11"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+            </TabItem>
+        </TabControl>
 
         <Border Grid.Row="2"
                 Background="{StaticResource PanelBrush}"
@@ -666,7 +911,7 @@
                 BorderThickness="1"
                 CornerRadius="8"
                 Padding="12,8">
-            <TextBlock Text="提示：通用档默认不勾选宏、技能/动作按钮、完整 dump。只有手动勾选高风险模块时，才可能覆盖技能栏摆放或宏。"
+            <TextBlock Text="提示：保存档可跨角色覆盖；门派不匹配时会额外提醒宏、技能/动作按钮和完整 dump 的覆盖风险。覆盖前始终会自动备份目标角色。"
                        Foreground="{StaticResource MutedBrush}"
                        TextWrapping="Wrap"/>
         </Border>

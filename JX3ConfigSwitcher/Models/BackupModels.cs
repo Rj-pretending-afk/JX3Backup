@@ -33,6 +33,8 @@ public sealed record SaveSlotRecord(
     SaveKind Kind,
     string? CharacterKey,
     string? SectTag,
+    string? SectColor,
+    bool IsFavorite,
     DateTime UpdatedAt);
 
 public sealed record BackupVersionRecord(
@@ -58,10 +60,18 @@ public sealed record CharacterConfig(
     string Server,
     string CharacterName,
     string CharacterPath,
-    IReadOnlyList<string> DumpFiles)
+    IReadOnlyList<string> DumpFiles,
+    string? Sect = null,
+    string? Kungfu = null,
+    int? EquipmentScore = null)
 {
     public string Key => $"{Account}/{Server}/{CharacterName}";
     public string DisplayName => $"{Account} / {Server} / {CharacterName}";
+    public string SectTag => string.IsNullOrWhiteSpace(Kungfu)
+        ? Sect ?? string.Empty
+        : string.IsNullOrWhiteSpace(Sect)
+            ? Kungfu
+            : $"{Sect} / {Kungfu}";
 }
 
 public sealed record BackupFileEntry(
@@ -82,6 +92,7 @@ public sealed record BackupManifest(
     string SourcePath,
     string? SourceCharacterKey,
     string? SectTag,
+    string? SectColor,
     string MachineName,
     DateTime CreatedAt,
     IReadOnlyList<ConfigModule> IncludedModules,

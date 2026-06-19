@@ -43,11 +43,12 @@ public sealed class BackupService
         CharacterConfig source,
         IEnumerable<ConfigModule> selectedModules,
         string? sectTag,
+        string? sectColor,
         string note)
     {
         var modules = selectedModules.Distinct().ToArray();
-        var slot = _repository.UpsertSlot(profile.Id, slotNumber, slotName, kind, source.Key, sectTag);
-        var packagePath = CreatePackage(profile, slot, kind, source.CharacterPath, source.Key, sectTag, modules, note, _paths.BackupDirectory);
+        var slot = _repository.UpsertSlot(profile.Id, slotNumber, slotName, kind, source.Key, sectTag, sectColor);
+        var packagePath = CreatePackage(profile, slot, kind, source.CharacterPath, source.Key, sectTag, sectColor, modules, note, _paths.BackupDirectory);
         var manifest = ReadManifest(packagePath);
         var record = new BackupVersionRecord(
             0,
@@ -67,14 +68,24 @@ public sealed class BackupService
 
     public BackupVersionRecord CreateAutoSnapshot(ProfileRecord profile, CharacterConfig target, string reason)
     {
-        var slot = _repository.UpsertSlot(profile.Id, 99, "自动快照", SaveKind.AutoSnapshot, target.Key, null);
+        var slot = new SaveSlotRecord(
+            0,
+            profile.Id,
+            0,
+            "自动快照",
+            SaveKind.AutoSnapshot,
+            target.Key,
+            null,
+            null,
+            false,
+            DateTime.Now);
         var modules = Enum.GetValues(typeof(ConfigModule)).Cast<ConfigModule>().ToArray();
-        var packagePath = CreatePackage(profile, slot, SaveKind.AutoSnapshot, target.CharacterPath, target.Key, null, modules, reason, _paths.SnapshotDirectory);
+        var packagePath = CreatePackage(profile, slot, SaveKind.AutoSnapshot, target.CharacterPath, target.Key, null, null, modules, reason, _paths.SnapshotDirectory);
         var manifest = ReadManifest(packagePath);
         var record = new BackupVersionRecord(
             0,
             profile.Id,
-            99,
+            0,
             SaveKind.AutoSnapshot,
             packagePath,
             target.CharacterPath,
@@ -112,7 +123,7 @@ public sealed class BackupService
             }
 
             Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
-            entry.ExtractToFile(destination, overwrite: true);
+            ExtractEntryAtomically(entry, destination);
         }
 
         if (modules.Contains(ConfigModule.ActionButtons))
@@ -125,6 +136,56 @@ public sealed class BackupService
         }
 
         _repository.AddLog("Info", $"恢复备份到：{target.DisplayName}");
+    }
+
+    public void CopyCharacterConfig(
+        ProfileRecord profile,
+        CharacterConfig source,
+        CharacterConfig target,
+        IEnumerable<ConfigModule> selectedModules,
+        string reason)
+    {
+        if (_processGuard.IsGameRunning())
+        {
+            throw new InvalidOperationException("检测到剑网3正在运行。为了避免游戏写回覆盖配置，请关闭游戏后再跨角色覆盖。");
+        }
+
+        if (string.Equals(source.CharacterPath, target.CharacterPath, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException("来源角色和目标角色相同，不需要跨角色覆盖。");
+        }
+
+        var modules = selectedModules.Distinct().ToArray();
+        if (modules.Length == 0)
+        {
+            throw new InvalidOperationException("至少选择一个要覆盖的模块。");
+        }
+
+        CreateAutoSnapshot(profile, target, reason);
+        var slot = new SaveSlotRecord(
+            0,
+            profile.Id,
+            0,
+            "跨角色覆盖",
+            SaveKind.AutoSnapshot,
+            source.Key,
+            null,
+            null,
+            false,
+            DateTime.Now);
+        var packagePath = CreatePackage(
+            profile,
+            slot,
+            SaveKind.AutoSnapshot,
+            source.CharacterPath,
+            source.Key,
+            null,
+            null,
+            modules,
+            reason,
+            _paths.SnapshotDirectory);
+        RestoreBackup(packagePath, target, modules);
+        _repository.AddLog("Info", $"跨角色覆盖：{source.DisplayName} -> {target.DisplayName}");
     }
 
     public BackupManifest ReadManifest(string packagePath)
@@ -164,6 +225,7 @@ public sealed class BackupService
         string sourcePath,
         string? sourceCharacterKey,
         string? sectTag,
+        string? sectColor,
         IReadOnlyCollection<ConfigModule> modules,
         string? note,
         string outputRoot)
@@ -174,9 +236,9 @@ public sealed class BackupService
         }
 
         Directory.CreateDirectory(outputRoot);
-        var timestamp = DateTime.Now.ToString("yyyyMMdd-HHmmss");
+        var timestamp = DateTime.Now.ToString("yyyyMMdd-HHmmss-fff");
         var safeProfile = MakeSafeName(profile.Name);
-        var fileName = $"{safeProfile}-slot{slot.SlotNumber:00}-{kind}-{timestamp}.zip";
+        var fileName = $"{safeProfile}-slot{slot.SlotNumber:00}-{kind}-{timestamp}-{Guid.NewGuid():N}.zip";
         var packagePath = Path.Combine(outputRoot, fileName);
         var files = EnumerateIncludedFiles(sourcePath, modules).ToList();
         var entries = new List<BackupFileEntry>();
@@ -234,6 +296,7 @@ public sealed class BackupService
                 sourcePath,
                 sourceCharacterKey,
                 sectTag,
+                sectColor,
                 Environment.MachineName,
                 DateTime.Now,
                 modules.ToArray(),
@@ -269,6 +332,34 @@ public sealed class BackupService
         using var stream = entry.Open();
         var manifest = JsonSerializer.Deserialize<BackupManifest>(stream);
         return manifest ?? throw new InvalidDataException("manifest.json 读取失败。");
+    }
+
+    private static void ExtractEntryAtomically(ZipArchiveEntry entry, string destination)
+    {
+        var directory = Path.GetDirectoryName(destination) ?? throw new InvalidOperationException($"目标路径无效：{destination}");
+        Directory.CreateDirectory(directory);
+        var tempPath = Path.Combine(directory, $".{Path.GetFileName(destination)}.{Guid.NewGuid():N}.tmp");
+        var backupPath = Path.Combine(directory, $"{Path.GetFileName(destination)}.{DateTime.Now:yyyyMMddHHmmssfff}.bak");
+
+        try
+        {
+            entry.ExtractToFile(tempPath, overwrite: false);
+            if (File.Exists(destination))
+            {
+                File.Replace(tempPath, destination, backupPath, ignoreMetadataErrors: true);
+            }
+            else
+            {
+                File.Move(tempPath, destination);
+            }
+        }
+        finally
+        {
+            if (File.Exists(tempPath))
+            {
+                File.Delete(tempPath);
+            }
+        }
     }
 
     private static string ComputeSha256(string file)

@@ -48,7 +48,7 @@ public sealed class ProfileRepository
         using var connection = _database.OpenConnection();
         using var command = connection.CreateCommand();
         command.CommandText = @"
-            SELECT id, profile_id, slot_number, name, kind, character_key, sect_tag, updated_at
+            SELECT id, profile_id, slot_number, name, kind, character_key, sect_tag, sect_color, is_favorite, updated_at
             FROM save_slots
             WHERE profile_id = $profile
             ORDER BY slot_number;
@@ -70,7 +70,8 @@ public sealed class ProfileRepository
         string name,
         SaveKind kind,
         string? characterKey,
-        string? sectTag)
+        string? sectTag,
+        string? sectColor = null)
     {
         if (slotNumber is < 1 or > 99)
         {
@@ -81,15 +82,16 @@ public sealed class ProfileRepository
         using var connection = _database.OpenConnection();
         using var command = connection.CreateCommand();
         command.CommandText = @"
-            INSERT INTO save_slots(profile_id, slot_number, name, kind, character_key, sect_tag, updated_at)
-            VALUES($profile, $slot, $name, $kind, $character, $sect, $updated)
+            INSERT INTO save_slots(profile_id, slot_number, name, kind, character_key, sect_tag, sect_color, updated_at)
+            VALUES($profile, $slot, $name, $kind, $character, $sect, $sectColor, $updated)
             ON CONFLICT(profile_id, slot_number) DO UPDATE SET
                 name = excluded.name,
                 kind = excluded.kind,
                 character_key = excluded.character_key,
                 sect_tag = excluded.sect_tag,
+                sect_color = excluded.sect_color,
                 updated_at = excluded.updated_at
-            RETURNING id, profile_id, slot_number, name, kind, character_key, sect_tag, updated_at;
+            RETURNING id, profile_id, slot_number, name, kind, character_key, sect_tag, sect_color, is_favorite, updated_at;
             ";
         command.Parameters.AddWithValue("$profile", profileId);
         command.Parameters.AddWithValue("$slot", slotNumber);
@@ -97,6 +99,7 @@ public sealed class ProfileRepository
         command.Parameters.AddWithValue("$kind", kind.ToString());
         command.Parameters.AddWithValue("$character", (object?)characterKey ?? DBNull.Value);
         command.Parameters.AddWithValue("$sect", (object?)sectTag ?? DBNull.Value);
+        command.Parameters.AddWithValue("$sectColor", (object?)sectColor ?? DBNull.Value);
         command.Parameters.AddWithValue("$updated", now.ToString("O"));
         using var reader = command.ExecuteReader();
         if (!reader.Read())
@@ -124,6 +127,21 @@ public sealed class ProfileRepository
         command.Parameters.AddWithValue("$modules", record.ModuleSummary);
         command.Parameters.AddWithValue("$containsDump", record.ContainsDump ? 1 : 0);
         command.Parameters.AddWithValue("$created", record.CreatedAt.ToUniversalTime().ToString("O"));
+        command.ExecuteNonQuery();
+    }
+
+    public void SetSlotFavorite(long profileId, int slotNumber, bool isFavorite)
+    {
+        using var connection = _database.OpenConnection();
+        using var command = connection.CreateCommand();
+        command.CommandText = @"
+            UPDATE save_slots
+            SET is_favorite = $favorite
+            WHERE profile_id = $profile AND slot_number = $slot;
+            ";
+        command.Parameters.AddWithValue("$profile", profileId);
+        command.Parameters.AddWithValue("$slot", slotNumber);
+        command.Parameters.AddWithValue("$favorite", isFavorite ? 1 : 0);
         command.ExecuteNonQuery();
     }
 
@@ -201,6 +219,8 @@ public sealed class ProfileRepository
             Enum.Parse<SaveKind>(reader.GetString(4)),
             reader.IsDBNull(5) ? null : reader.GetString(5),
             reader.IsDBNull(6) ? null : reader.GetString(6),
-            DateTime.Parse(reader.GetString(7)).ToLocalTime());
+            reader.IsDBNull(7) ? null : reader.GetString(7),
+            reader.GetInt32(8) == 1,
+            DateTime.Parse(reader.GetString(9)).ToLocalTime());
     }
 }

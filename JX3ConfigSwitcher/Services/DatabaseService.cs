@@ -46,6 +46,8 @@ public sealed class DatabaseService
                 kind TEXT NOT NULL,
                 character_key TEXT NULL,
                 sect_tag TEXT NULL,
+                sect_color TEXT NULL,
+                is_favorite INTEGER NOT NULL DEFAULT 0,
                 updated_at TEXT NOT NULL,
                 UNIQUE(profile_id, slot_number),
                 FOREIGN KEY(profile_id) REFERENCES profiles(id) ON DELETE CASCADE
@@ -73,6 +75,9 @@ public sealed class DatabaseService
             );
             ");
 
+        EnsureColumn(connection, "save_slots", "sect_color", "TEXT NULL");
+        EnsureColumn(connection, "save_slots", "is_favorite", "INTEGER NOT NULL DEFAULT 0");
+
         Execute(connection, @"
             INSERT INTO profiles(name, created_at)
             SELECT '默认用户', $now
@@ -90,5 +95,23 @@ public sealed class DatabaseService
         }
 
         command.ExecuteNonQuery();
+    }
+
+    private static void EnsureColumn(SqliteConnection connection, string tableName, string columnName, string definition)
+    {
+        using var probe = connection.CreateCommand();
+        probe.CommandText = $"PRAGMA table_info({tableName});";
+        using var reader = probe.ExecuteReader();
+        while (reader.Read())
+        {
+            if (string.Equals(reader.GetString(1), columnName, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+        }
+
+        using var alter = connection.CreateCommand();
+        alter.CommandText = $"ALTER TABLE {tableName} ADD COLUMN {columnName} {definition};";
+        alter.ExecuteNonQuery();
     }
 }

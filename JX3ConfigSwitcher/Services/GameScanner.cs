@@ -3,16 +3,24 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using JX3ConfigSwitcher.Models;
+using Microsoft.Win32;
 
 namespace JX3ConfigSwitcher.Services;
 
 public sealed class GameScanner
 {
     private readonly IReadOnlyList<string> _candidateRoots;
+    private readonly Func<IEnumerable<string>> _registryPathProvider;
+    private readonly MingYiRoleInfoReader _roleInfoReader;
 
-    public GameScanner(IEnumerable<string>? candidateRoots = null)
+    public GameScanner(
+        IEnumerable<string>? candidateRoots = null,
+        Func<IEnumerable<string>>? registryPathProvider = null,
+        MingYiRoleInfoReader? roleInfoReader = null)
     {
         _candidateRoots = candidateRoots?.ToArray() ?? BuildDefaultCandidateRoots();
+        _registryPathProvider = registryPathProvider ?? BuildRegistryCandidateRoots;
+        _roleInfoReader = roleInfoReader ?? new MingYiRoleInfoReader();
     }
 
     public IReadOnlyList<string> FindGameRoots(string? preferredPath)
@@ -24,6 +32,7 @@ public sealed class GameScanner
         }
 
         roots.AddRange(_candidateRoots);
+        roots.AddRange(_registryPathProvider().SelectMany(ExpandCandidatePath));
         var found = roots
             .Where(path => Directory.Exists(path))
             .Where(path => FindUserDataDirectory(path) is not null)
@@ -102,6 +111,147 @@ public sealed class GameScanner
             .ToList();
     }
 
+    private static IEnumerable<string> BuildRegistryCandidateRoots()
+    {
+        var roots = new List<string>();
+        foreach (var hive in new[] { Registry.LocalMachine, Registry.CurrentUser })
+        {
+            foreach (var subKey in RegistryInstallKeys())
+            {
+                roots.AddRange(ReadRegistryPaths(hive, subKey));
+            }
+        }
+
+        roots.AddRange(ReadUninstallRegistryPaths(Registry.LocalMachine));
+        roots.AddRange(ReadUninstallRegistryPaths(Registry.CurrentUser));
+        return roots;
+    }
+
+    private static IEnumerable<string> RegistryInstallKeys()
+    {
+        yield return @"SOFTWARE\Kingsoft\JX3";
+        yield return @"SOFTWARE\WOW6432Node\Kingsoft\JX3";
+        yield return @"SOFTWARE\SeasunGame\JX3";
+        yield return @"SOFTWARE\WOW6432Node\SeasunGame\JX3";
+        yield return @"SOFTWARE\Kingsoft\剑网3";
+        yield return @"SOFTWARE\WOW6432Node\Kingsoft\剑网3";
+    }
+
+    private static IEnumerable<string> ReadRegistryPaths(RegistryKey hive, string subKeyName)
+    {
+        try
+        {
+            using var key = hive.OpenSubKey(subKeyName);
+            if (key is null)
+            {
+                return Array.Empty<string>();
+            }
+
+            var names = new[] { "InstallPath", "InstallLocation", "GamePath", "ClientPath", "Path", "Directory", "DisplayIcon", "UninstallString" };
+            return names
+                .Select(name => key.GetValue(name) as string)
+                .Where(value => !string.IsNullOrWhiteSpace(value))
+                .Select(value => value!)
+                .ToArray();
+        }
+        catch
+        {
+            return Array.Empty<string>();
+        }
+    }
+
+    private static IEnumerable<string> ReadUninstallRegistryPaths(RegistryKey hive)
+    {
+        foreach (var root in new[] { @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall" })
+        {
+            using var key = SafeOpenSubKey(hive, root);
+            if (key is null)
+            {
+                continue;
+            }
+
+            foreach (var subKeyName in key.GetSubKeyNames())
+            {
+                using var appKey = SafeOpenSubKey(key, subKeyName);
+                if (appKey is not RegistryKey appRegistryKey)
+                {
+                    continue;
+                }
+
+                var displayName = appRegistryKey.GetValue("DisplayName") as string;
+                if (string.IsNullOrWhiteSpace(displayName) || !LooksLikeJx3DisplayName(displayName))
+                {
+                    continue;
+                }
+
+                foreach (var valueName in new[] { "InstallLocation", "DisplayIcon", "UninstallString" })
+                {
+                    if (appRegistryKey.GetValue(valueName) is string value && !string.IsNullOrWhiteSpace(value))
+                    {
+                        yield return value;
+                    }
+                }
+            }
+        }
+    }
+
+    private static RegistryKey? SafeOpenSubKey(RegistryKey key, string name)
+    {
+        try
+        {
+            return key.OpenSubKey(name);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static bool LooksLikeJx3DisplayName(string displayName)
+    {
+        return displayName.Contains("JX3", StringComparison.OrdinalIgnoreCase)
+            || displayName.Contains("剑网3", StringComparison.OrdinalIgnoreCase)
+            || displayName.Contains("剑侠情缘网络版叁", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static IEnumerable<string> ExpandCandidatePath(string rawPath)
+    {
+        var cleaned = CleanRegistryPath(rawPath);
+        if (string.IsNullOrWhiteSpace(cleaned))
+        {
+            yield break;
+        }
+
+        var current = File.Exists(cleaned) ? Path.GetDirectoryName(cleaned) : cleaned;
+        for (var depth = 0; depth < 5 && !string.IsNullOrWhiteSpace(current); depth++)
+        {
+            yield return current;
+            yield return Path.Combine(current, "JX3");
+            current = Directory.GetParent(current)?.FullName;
+        }
+    }
+
+    private static string CleanRegistryPath(string value)
+    {
+        var trimmed = value.Trim().Trim('"');
+        if (trimmed.StartsWith("\"", StringComparison.Ordinal))
+        {
+            var endQuote = trimmed.IndexOf('"', 1);
+            if (endQuote > 1)
+            {
+                return trimmed.Substring(1, endQuote - 1);
+            }
+        }
+
+        var exeIndex = trimmed.IndexOf(".exe", StringComparison.OrdinalIgnoreCase);
+        if (exeIndex >= 0)
+        {
+            return trimmed.Substring(0, exeIndex + 4).Trim('"');
+        }
+
+        return trimmed;
+    }
+
     private static IEnumerable<string> FindCharacterDirectories(string userData)
     {
         foreach (var directory in EnumerateDirectoriesByDepth(userData, maxDepth: 5))
@@ -118,7 +268,7 @@ public sealed class GameScanner
         }
     }
 
-    private static CharacterConfig? CreateCharacterConfig(string userData, string characterDir)
+    private CharacterConfig? CreateCharacterConfig(string userData, string characterDir)
     {
         var relativePath = Path.GetRelativePath(userData, characterDir);
         var parts = relativePath
@@ -142,7 +292,16 @@ public sealed class GameScanner
                 ? parts[1]
                 : "未知区服";
 
-        return new CharacterConfig(account, server, characterName, characterDir, dumps);
+        var metadata = _roleInfoReader.TryRead(characterDir, characterName);
+        return new CharacterConfig(
+            account,
+            server,
+            characterName,
+            characterDir,
+            dumps,
+            metadata.Sect,
+            metadata.Kungfu,
+            metadata.EquipmentScore);
     }
 
     private static bool LooksLikeCharacterDirectory(string directory)

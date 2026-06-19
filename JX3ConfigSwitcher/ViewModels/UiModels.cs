@@ -17,7 +17,7 @@ public sealed partial class SlotViewModel : ObservableObject
     private string name;
 
     [ObservableProperty]
-    private SaveKind kind = SaveKind.Universal;
+    private SaveKind kind = SaveKind.CharacterSpecific;
 
     [ObservableProperty]
     private string? characterKey;
@@ -26,16 +26,21 @@ public sealed partial class SlotViewModel : ObservableObject
     private string? sectTag;
 
     [ObservableProperty]
+    private string sectColor = "#4CC9F0";
+
+    [ObservableProperty]
     private bool hasData;
 
+    [ObservableProperty]
+    private bool isFavorite;
+
+    [ObservableProperty]
+    private bool isMatched;
+
     public string NumberText => Number.ToString("00");
-    public string KindText => Kind switch
-    {
-        SaveKind.Universal => "通用",
-        SaveKind.CharacterSpecific => "角色",
-        SaveKind.AutoSnapshot => "快照",
-        _ => Kind.ToString()
-    };
+    public string KindText => Kind is SaveKind.AutoSnapshot ? "自动快照" : "手动保存";
+    public string FavoriteText => IsFavorite ? "★" : "☆";
+    public string MatchText => IsMatched ? "匹配" : string.Empty;
 
     public void Apply(SaveSlotRecord record)
     {
@@ -43,8 +48,22 @@ public sealed partial class SlotViewModel : ObservableObject
         Kind = record.Kind;
         CharacterKey = record.CharacterKey;
         SectTag = record.SectTag;
+        SectColor = string.IsNullOrWhiteSpace(record.SectColor) ? "#4CC9F0" : record.SectColor;
+        IsFavorite = record.IsFavorite;
         HasData = true;
         OnPropertyChanged(nameof(KindText));
+        OnPropertyChanged(nameof(FavoriteText));
+    }
+
+    public void SetMatched(bool value)
+    {
+        IsMatched = value;
+        OnPropertyChanged(nameof(MatchText));
+    }
+
+    partial void OnIsFavoriteChanged(bool value)
+    {
+        OnPropertyChanged(nameof(FavoriteText));
     }
 }
 

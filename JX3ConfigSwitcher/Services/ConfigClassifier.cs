@@ -15,16 +15,19 @@ public sealed class ConfigClassifier
 
     public IReadOnlyList<ModuleChoice> GetDefaultChoices(SaveKind kind)
     {
-        var safeSelected = kind is SaveKind.Universal;
-        var fullSelected = kind is SaveKind.CharacterSpecific or SaveKind.AutoSnapshot;
+        return GetDefaultChoices(includeHighRisk: kind is SaveKind.CharacterSpecific or SaveKind.AutoSnapshot);
+    }
+
+    public IReadOnlyList<ModuleChoice> GetDefaultChoices(bool includeHighRisk)
+    {
         return new List<ModuleChoice>
         {
             new(ConfigModule.UiLayout, "界面布局", "窗口位置、界面布局和普通 UI 配置", true, false),
-            new(ConfigModule.KeyBindings, "快捷键/键位", "键位相关配置；不会主动包含技能栏摆放", true, false),
+            new(ConfigModule.KeyBindings, "快捷键/键位", "键位相关配置；不主动包含技能栏摆放", true, false),
             new(ConfigModule.DisplayChatAddon, "显示/聊天/插件", "画质、聊天、插件等通用设置", true, false),
-            new(ConfigModule.Macros, "宏", "高风险：可能覆盖宏", fullSelected && !safeSelected, true),
-            new(ConfigModule.ActionButtons, "技能/动作按钮", "高风险：可独立备份 ActionBar 技能摆放", fullSelected && !safeSelected, true),
-            new(ConfigModule.FullDump, "完整 dump", "高风险：完整 userpreferences 配置可能包含动作栏/宏", fullSelected && !safeSelected, true)
+            new(ConfigModule.Macros, "宏", "高风险：可能覆盖宏", includeHighRisk, true),
+            new(ConfigModule.ActionButtons, "技能/动作按钮", "高风险：可独立备份 ActionBar 技能摆放", includeHighRisk, true),
+            new(ConfigModule.FullDump, "完整 dump", "高风险：完整 userpreferences 配置可能包含动作栏/宏", includeHighRisk, true)
         };
     }
 

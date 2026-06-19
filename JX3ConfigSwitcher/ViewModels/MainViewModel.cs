@@ -10,7 +10,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using JX3ConfigSwitcher.Models;
 using JX3ConfigSwitcher.Services;
-using JX3ConfigSwitcher.Views;
 using MessageBox = System.Windows.MessageBox;
 
 namespace JX3ConfigSwitcher.ViewModels;
@@ -24,6 +23,7 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly ConfigClassifier _classifier;
     private readonly BackupService _backupService;
     private readonly SyncService _syncService;
+    private readonly IBackupProfileHostApi _profileHostApi;
 
     public MainViewModel(
         PortablePaths paths,
@@ -32,7 +32,8 @@ public sealed partial class MainViewModel : ObservableObject
         GameScanner scanner,
         ConfigClassifier classifier,
         BackupService backupService,
-        SyncService syncService)
+        SyncService syncService,
+        IBackupProfileHostApi? profileHostApi = null)
     {
         _paths = paths;
         _settingsService = settingsService;
@@ -41,7 +42,9 @@ public sealed partial class MainViewModel : ObservableObject
         _classifier = classifier;
         _backupService = backupService;
         _syncService = syncService;
-        SelectedSaveKind = SaveKind.Universal;
+        _profileHostApi = profileHostApi ?? new DialogBackupProfileHostApi();
+        SelectedSaveKind = SaveKind.CharacterSpecific;
+        SelectedSectOption = SectCatalog.Default;
         ResetModuleChoices();
     }
 
@@ -51,6 +54,8 @@ public sealed partial class MainViewModel : ObservableObject
     public ObservableCollection<BackupVersionRecord> RecentBackups { get; } = new();
     public ObservableCollection<OperationLogRecord> Logs { get; } = new();
     public ObservableCollection<ModuleChoiceViewModel> ModuleChoices { get; } = new();
+    public ObservableCollection<SlotViewModel> CoverSourceSlots { get; } = new();
+    public ObservableCollection<SlotViewModel> FavoriteSlots { get; } = new();
     public ObservableCollection<string> ScanRoots { get; } = new();
     public ObservableCollection<string> SyncConflicts { get; } = new();
 
@@ -62,6 +67,9 @@ public sealed partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private CharacterConfig? selectedCharacter;
+
+    [ObservableProperty]
+    private CharacterConfig? crossSourceCharacter;
 
     [ObservableProperty]
     private BackupVersionRecord? selectedBackup;
@@ -82,6 +90,9 @@ public sealed partial class MainViewModel : ObservableObject
     private string sectTagDraft = string.Empty;
 
     [ObservableProperty]
+    private SectOption? selectedSectOption;
+
+    [ObservableProperty]
     private string noteDraft = string.Empty;
 
     [ObservableProperty]
@@ -95,7 +106,9 @@ public sealed partial class MainViewModel : ObservableObject
 
     public string DataDirectory => _paths.DataDirectory;
 
-    public IReadOnlyList<SaveKind> SaveKinds { get; } = new[] { SaveKind.Universal, SaveKind.CharacterSpecific };
+    public IReadOnlyList<SaveKind> SaveKinds { get; } = new[] { SaveKind.CharacterSpecific };
+
+    public IReadOnlyList<SectOption> SectOptions => SectCatalog.All;
 
     public void Initialize()
     {
@@ -124,8 +137,40 @@ public sealed partial class MainViewModel : ObservableObject
         }
 
         SlotNameDraft = value.HasData ? value.Name : $"保存档 {value.Number:00}";
-        SelectedSaveKind = value.HasData ? value.Kind : SaveKind.Universal;
+        SelectedSaveKind = SaveKind.CharacterSpecific;
         SectTagDraft = value.SectTag ?? string.Empty;
+        SelectedSectOption = SectCatalog.Find(value.SectTag)
+            ?? SectCatalog.FindByColor(value.SectColor)
+            ?? SectCatalog.Default;
+        if (!value.HasData)
+        {
+            ApplyCharacterSect(SelectedCharacter);
+        }
+    }
+
+    partial void OnSelectedCharacterChanged(CharacterConfig? value)
+    {
+        if (SelectedSlot is null || !SelectedSlot.HasData)
+        {
+            ApplyCharacterSect(value);
+        }
+
+        RefreshRecentBackups();
+        RefreshCoverSources();
+        ResetModuleChoices();
+    }
+
+    partial void OnSelectedSectOptionChanged(SectOption? value)
+    {
+        if (value is not null)
+        {
+            SectTagDraft = value.Tag;
+        }
+    }
+
+    partial void OnCrossSourceCharacterChanged(CharacterConfig? value)
+    {
+        ResetModuleChoices();
     }
 
     partial void OnSelectedSaveKindChanged(SaveKind value)
@@ -135,13 +180,13 @@ public sealed partial class MainViewModel : ObservableObject
 
     partial void OnSelectedBackupChanged(BackupVersionRecord? value)
     {
-        UpdateRiskSummary();
+        ResetModuleChoices();
     }
 
     [RelayCommand]
     private void CreateProfile()
     {
-        var name = InputDialog.Ask("新建 Profile", "输入用户名称，例如：我、她、朋友A", "");
+        var name = _profileHostApi.RequestCreateProfileName(Profiles.ToList());
         if (string.IsNullOrWhiteSpace(name))
         {
             return;
@@ -152,6 +197,7 @@ public sealed partial class MainViewModel : ObservableObject
             var profile = _repository.CreateProfile(name);
             Profiles.Add(profile);
             SelectedProfile = profile;
+            _profileHostApi.OnProfileCreated(profile);
             StatusMessage = $"已创建 profile：{profile.Name}";
         }
         catch (Exception ex)
@@ -235,6 +281,7 @@ public sealed partial class MainViewModel : ObservableObject
         }
 
         SelectedCharacter = Characters.FirstOrDefault();
+        CrossSourceCharacter = null;
         StatusMessage = $"扫描完成：{Characters.Count} 个角色。";
     }
 
@@ -261,10 +308,12 @@ public sealed partial class MainViewModel : ObservableObject
                 character,
                 modules,
                 string.IsNullOrWhiteSpace(SectTagDraft) ? null : SectTagDraft,
+                SelectedSectOption?.Color,
                 NoteDraft));
             StatusMessage = "备份完成。";
             BuildSlotGrid();
             RefreshRecentBackups();
+            RefreshCoverSources();
             RefreshLogs();
         }
         catch (Exception ex)
@@ -324,6 +373,142 @@ public sealed partial class MainViewModel : ObservableObject
         {
             MessageBox.Show(ex.Message, "恢复失败", MessageBoxButton.OK, MessageBoxImage.Error);
             StatusMessage = "恢复失败。";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task CopyFromCharacter()
+    {
+        if (SelectedProfile is null || CrossSourceCharacter is null || SelectedCharacter is null)
+        {
+            MessageBox.Show("请选择 profile、来源角色和目标角色。", "无法跨角色覆盖", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var modules = SelectedModules();
+        if (modules.Count == 0)
+        {
+            MessageBox.Show("至少选择一个要覆盖的模块。", "无法跨角色覆盖", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var confirm = MessageBox.Show(
+            $"会先自动备份目标角色，再从来源角色覆盖所选模块。\n\n来源：{CrossSourceCharacter.DisplayName}\n目标：{SelectedCharacter.DisplayName}\n\n模块：{string.Join(", ", modules.Select(BackupService.GetModuleName))}\n\n确认继续？",
+            "确认跨角色覆盖",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+        if (confirm != MessageBoxResult.Yes)
+        {
+            return;
+        }
+
+        IsBusy = true;
+        try
+        {
+            var profile = SelectedProfile;
+            var source = CrossSourceCharacter;
+            var target = SelectedCharacter;
+            await Task.Run(() => _backupService.CopyCharacterConfig(
+                profile,
+                source,
+                target,
+                modules,
+                $"跨角色覆盖 {source.DisplayName} -> {target.DisplayName}"));
+            StatusMessage = "跨角色覆盖完成，已自动备份目标角色。";
+            RefreshRecentBackups();
+            RefreshLogs();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "跨角色覆盖失败", MessageBoxButton.OK, MessageBoxImage.Error);
+            StatusMessage = "跨角色覆盖失败。";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private void ToggleSlotFavorite(SlotViewModel? slot)
+    {
+        if (SelectedProfile is null || slot is null || !slot.HasData)
+        {
+            return;
+        }
+
+        var next = !slot.IsFavorite;
+        _repository.SetSlotFavorite(SelectedProfile.Id, slot.Number, next);
+        slot.IsFavorite = next;
+        RefreshCoverSources();
+    }
+
+    public async Task CoverSlotToCharacterAsync(int slotNumber, CharacterConfig target)
+    {
+        if (SelectedProfile is null)
+        {
+            return;
+        }
+
+        var slot = Slots.FirstOrDefault(candidate => candidate.Number == slotNumber && candidate.HasData);
+        if (slot is null)
+        {
+            MessageBox.Show("这个保存档还没有手动保存内容。", "无法覆盖", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var backup = _repository
+            .GetRecentBackups(SelectedProfile.Id, 500)
+            .Where(record => record.SlotNumber == slotNumber && record.Kind != SaveKind.AutoSnapshot)
+            .OrderByDescending(record => record.CreatedAt)
+            .FirstOrDefault();
+        if (backup is null)
+        {
+            MessageBox.Show("没有找到这个保存档对应的备份版本。", "无法覆盖", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var manifest = _backupService.ReadManifest(backup.PackagePath);
+        var modules = manifest.IncludedModules.Distinct().ToList();
+        var isMatch = SlotMatchesCharacter(slot, target);
+        if (modules.Count == 0)
+        {
+            MessageBox.Show("这个保存档没有可覆盖的模块。", "无法覆盖", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var confirm = MessageBox.Show(
+            $"把保存档 {slot.NumberText} 覆盖到角色：\n{target.DisplayName}\n\n{(isMatch ? "门派/心法匹配，将按保存档模块覆盖；如果保存档包含完整 dump，也会一并写回。" : "门派/心法不匹配，但仍会按保存档模块覆盖。注意：如果保存档包含宏、技能/动作按钮或完整 dump，目标角色对应内容也会被覆盖。")}\n\n覆盖前会自动备份目标角色。继续？",
+            "确认拖拽覆盖",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+        if (confirm != MessageBoxResult.Yes)
+        {
+            return;
+        }
+
+        IsBusy = true;
+        try
+        {
+            var profile = SelectedProfile;
+            await Task.Run(() =>
+            {
+                _backupService.CreateAutoSnapshot(profile, target, $"拖拽覆盖 Slot {slot.NumberText} 前自动快照");
+                _backupService.RestoreBackup(backup.PackagePath, target, modules);
+            });
+            SelectedCharacter = target;
+            StatusMessage = $"已用保存档 {slot.NumberText} 覆盖 {target.CharacterName}。";
+            RefreshRecentBackups();
+            RefreshLogs();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "拖拽覆盖失败", MessageBoxButton.OK, MessageBoxImage.Error);
+            StatusMessage = "拖拽覆盖失败。";
         }
         finally
         {
@@ -395,17 +580,51 @@ public sealed partial class MainViewModel : ObservableObject
         }
 
         SelectedSlot = Slots.FirstOrDefault(slot => slot.HasData) ?? Slots.FirstOrDefault();
+        RefreshCoverSources();
+    }
+
+    private void RefreshCoverSources()
+    {
+        CoverSourceSlots.Clear();
+        FavoriteSlots.Clear();
+
+        var saved = Slots
+            .Where(slot => slot.HasData)
+            .ToList();
+        foreach (var slot in saved)
+        {
+            slot.SetMatched(SelectedCharacter is not null && SlotMatchesCharacter(slot, SelectedCharacter));
+        }
+
+        foreach (var slot in saved
+                     .OrderByDescending(slot => slot.IsMatched)
+                     .ThenByDescending(slot => slot.IsFavorite)
+                     .ThenBy(slot => slot.Number))
+        {
+            CoverSourceSlots.Add(slot);
+        }
+
+        foreach (var slot in saved.Where(slot => slot.IsFavorite).OrderBy(slot => slot.Number))
+        {
+            FavoriteSlots.Add(slot);
+        }
     }
 
     private void RefreshRecentBackups()
     {
         RecentBackups.Clear();
-        foreach (var backup in _repository.GetRecentBackups(SelectedProfile?.Id, 80))
+        var characterPath = SelectedCharacter?.CharacterPath;
+        foreach (var backup in _repository
+                     .GetRecentBackups(SelectedProfile?.Id, 200)
+                     .Where(backup => string.IsNullOrWhiteSpace(characterPath)
+                         || string.Equals(Path.GetFullPath(backup.SourcePath), Path.GetFullPath(characterPath), StringComparison.OrdinalIgnoreCase))
+                     .Take(80))
         {
             RecentBackups.Add(backup);
         }
 
-        SelectedBackup ??= RecentBackups.FirstOrDefault();
+        SelectedBackup = RecentBackups.FirstOrDefault();
+        UpdateRiskSummary();
     }
 
     private void RefreshLogs()
@@ -426,15 +645,79 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
+    private void ApplyCharacterSect(CharacterConfig? character)
+    {
+        var option = SectCatalog.Find(character?.Kungfu)
+            ?? SectCatalog.Find(character?.Sect)
+            ?? SectCatalog.Default;
+        SelectedSectOption = option;
+        SectTagDraft = option == SectCatalog.Default && string.IsNullOrWhiteSpace(character?.SectTag)
+            ? string.Empty
+            : character?.SectTag ?? option.Tag;
+    }
+
     private void ResetModuleChoices()
     {
         ModuleChoices.Clear();
-        foreach (var choice in _classifier.GetDefaultChoices(SelectedSaveKind))
+        var includeHighRisk = !IsCrossCharacterRestore();
+        foreach (var choice in _classifier.GetDefaultChoices(includeHighRisk))
         {
             ModuleChoices.Add(new ModuleChoiceViewModel(choice));
         }
 
         UpdateRiskSummary();
+    }
+
+    private bool IsCrossCharacterRestore()
+    {
+        if (SelectedCharacter is null)
+        {
+            return false;
+        }
+
+        if (CrossSourceCharacter is not null && IsDifferentCharacter(CrossSourceCharacter, SelectedCharacter))
+        {
+            return true;
+        }
+
+        if (SelectedBackup is null)
+        {
+            return false;
+        }
+
+        try
+        {
+            var manifest = _backupService.ReadManifest(SelectedBackup.PackagePath);
+            return !string.IsNullOrWhiteSpace(manifest.SourceCharacterKey)
+                && !string.Equals(manifest.SourceCharacterKey, SelectedCharacter.Key, StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static bool IsDifferentCharacter(CharacterConfig source, CharacterConfig target)
+    {
+        return !string.Equals(source.Key, target.Key, StringComparison.OrdinalIgnoreCase)
+            || !string.Equals(source.CharacterPath, target.CharacterPath, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool SlotMatchesCharacter(SlotViewModel slot, CharacterConfig target)
+    {
+        if (string.IsNullOrWhiteSpace(slot.SectTag))
+        {
+            return false;
+        }
+
+        var option = SectCatalog.Find(slot.SectTag);
+        if (option is null)
+        {
+            return false;
+        }
+
+        return string.Equals(option.Kungfu, target.Kungfu, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(option.Sect, target.Sect, StringComparison.OrdinalIgnoreCase);
     }
 
     private void UpdateRiskSummary()

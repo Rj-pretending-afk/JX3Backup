@@ -20,17 +20,87 @@ public sealed class CoreServiceTests
     }
 
     [Fact]
-    public void Universal_Default_Modules_Exclude_High_Risk_Items()
+    public void Repository_Persists_Slot_Favorites()
+    {
+        using var temp = new TempWorkspace();
+        var repository = CreateRepository(temp.Root);
+        var profile = repository.GetProfiles().Single();
+
+        repository.UpsertSlot(profile.Id, 1, "favorite", SaveKind.CharacterSpecific, null, null);
+        repository.SetSlotFavorite(profile.Id, 1, true);
+
+        var slot = Assert.Single(repository.GetSlots(profile.Id));
+        Assert.True(slot.IsFavorite);
+    }
+
+    [Fact]
+    public void Manual_Save_Default_Modules_Include_High_Risk_Items()
     {
         var classifier = new ConfigClassifier();
 
-        var choices = classifier.GetDefaultChoices(SaveKind.Universal);
+        var choices = classifier.GetDefaultChoices(includeHighRisk: true);
 
         Assert.True(choices.Single(choice => choice.Module == ConfigModule.UiLayout).IsSelected);
         Assert.True(choices.Single(choice => choice.Module == ConfigModule.KeyBindings).IsSelected);
+        Assert.True(choices.Single(choice => choice.Module == ConfigModule.Macros).IsSelected);
+        Assert.True(choices.Single(choice => choice.Module == ConfigModule.ActionButtons).IsSelected);
+        Assert.True(choices.Single(choice => choice.Module == ConfigModule.FullDump).IsSelected);
+    }
+
+    [Fact]
+    public void Cross_Character_Default_Modules_Exclude_High_Risk_Items()
+    {
+        var classifier = new ConfigClassifier();
+
+        var choices = classifier.GetDefaultChoices(includeHighRisk: false);
+
+        Assert.True(choices.Single(choice => choice.Module == ConfigModule.UiLayout).IsSelected);
+        Assert.True(choices.Single(choice => choice.Module == ConfigModule.KeyBindings).IsSelected);
+        Assert.True(choices.Single(choice => choice.Module == ConfigModule.DisplayChatAddon).IsSelected);
         Assert.False(choices.Single(choice => choice.Module == ConfigModule.Macros).IsSelected);
         Assert.False(choices.Single(choice => choice.Module == ConfigModule.ActionButtons).IsSelected);
         Assert.False(choices.Single(choice => choice.Module == ConfigModule.FullDump).IsSelected);
+    }
+
+    [Fact]
+    public void Slot_And_Manifest_Persist_Sect_Color()
+    {
+        using var temp = new TempWorkspace();
+        var repository = CreateRepository(temp.Root);
+        var profile = repository.GetProfiles().Single();
+        var backupService = CreateBackupService(temp.Root, repository);
+
+        var sourcePath = Path.Combine(temp.Root, "source");
+        Directory.CreateDirectory(sourcePath);
+        File.WriteAllText(Path.Combine(sourcePath, "ui_layout.ini"), "safe ui");
+        var source = new CharacterConfig("acc", "server", "sourceRole", sourcePath, Array.Empty<string>());
+
+        var backup = backupService.CreateBackup(
+            profile,
+            3,
+            "colored",
+            SaveKind.CharacterSpecific,
+            source,
+            new[] { ConfigModule.UiLayout },
+            "ice",
+            "#7BB7FF",
+            "colored backup");
+
+        var slot = Assert.Single(repository.GetSlots(profile.Id), slot => slot.SlotNumber == 3);
+        var manifest = backupService.ReadManifest(backup.PackagePath);
+
+        Assert.Equal("#7BB7FF", slot.SectColor);
+        Assert.Equal("#7BB7FF", manifest.SectColor);
+    }
+
+    [Fact]
+    public void SectCatalog_Maps_Kungfu_To_Sect_Color()
+    {
+        var option = SectCatalog.Find("山海心诀");
+
+        Assert.NotNull(option);
+        Assert.Equal("万灵", option.Sect);
+        Assert.Equal("#84CC16", option.Color);
     }
 
     [Fact]
@@ -69,13 +139,52 @@ public sealed class CoreServiceTests
         Directory.CreateDirectory(characterPath);
         File.WriteAllText(Path.Combine(characterPath, "custom.dat"), "safe ui");
 
-        var scanner = new GameScanner(new[] { jx3Root });
+        var scanner = new GameScanner(new[] { jx3Root }, () => Array.Empty<string>());
 
         var roots = scanner.FindGameRoots(null);
         var characters = scanner.ScanCharacters(roots.Single());
 
         Assert.Equal(jx3Root, roots.Single());
         Assert.Equal("roleA", Assert.Single(characters).CharacterName);
+    }
+
+    [Fact]
+    public void Scanner_Uses_Registry_Candidate_Roots()
+    {
+        using var temp = new TempWorkspace();
+        var jx3Root = Path.Combine(temp.Root, "SeasunGame", "JX3");
+        var characterPath = Path.Combine(jx3Root, "bin", "zhcn_hd", "userdata", "accountA", "serverA", "roleA");
+        Directory.CreateDirectory(characterPath);
+        File.WriteAllText(Path.Combine(characterPath, "custom.dat"), "ui");
+
+        var scanner = new GameScanner(
+            Array.Empty<string>(),
+            () => new[] { Path.Combine(jx3Root, "bin", "zhcn_hd", "JX3ClientX64.exe") });
+
+        var roots = scanner.FindGameRoots(null);
+
+        Assert.Contains(Path.GetFullPath(jx3Root), roots);
+        Assert.Equal("roleA", Assert.Single(scanner.ScanCharacters(jx3Root)).CharacterName);
+    }
+
+    [Fact]
+    public void Scanner_Reads_MingYi_Role_Metadata()
+    {
+        using var temp = new TempWorkspace();
+        var characterPath = Path.Combine(temp.Root, "userdata", "accountA", "serverA", "roleA");
+        Directory.CreateDirectory(characterPath);
+        Directory.CreateDirectory(Path.Combine(temp.Root, "userdata", "accountA", "MingYi"));
+        File.WriteAllText(Path.Combine(characterPath, "custom.dat"), "ui");
+        File.WriteAllText(
+            Path.Combine(temp.Root, "userdata", "accountA", "MingYi", "roles.json"),
+            """{"name":"roleA","sect":"万花","kungfu":"花间游","equipmentScore":123456}""");
+
+        var scanner = new GameScanner(Array.Empty<string>(), () => Array.Empty<string>());
+        var character = Assert.Single(scanner.ScanCharacters(temp.Root));
+
+        Assert.Equal("万花", character.Sect);
+        Assert.Equal("花间游", character.Kungfu);
+        Assert.Equal(123456, character.EquipmentScore);
     }
 
     [Fact]
@@ -169,6 +278,7 @@ public sealed class CoreServiceTests
         Directory.CreateDirectory(Path.Combine(sourcePath, "userpreferences"));
         Directory.CreateDirectory(targetPath);
         File.WriteAllText(Path.Combine(sourcePath, "ui_layout.ini"), "safe ui");
+        File.WriteAllText(Path.Combine(targetPath, "ui_layout.ini"), "old ui");
         File.WriteAllText(Path.Combine(sourcePath, "macro.txt"), "macro");
         File.WriteAllText(Path.Combine(sourcePath, "userpreferences", "role.dump"), "dump");
         cndk.WritePayloadText(Path.Combine(sourcePath, "userpreferences.jx3dat"), "return {[\"ActionBar1_Page1/1\"]={5,9005}}");
@@ -184,6 +294,7 @@ public sealed class CoreServiceTests
             source,
             new[] { ConfigModule.UiLayout, ConfigModule.KeyBindings, ConfigModule.DisplayChatAddon },
             null,
+            null,
             "safe backup");
 
         var manifest = backupService.ReadManifest(backup.PackagePath);
@@ -195,6 +306,8 @@ public sealed class CoreServiceTests
         backupService.RestoreBackup(backup.PackagePath, target, new[] { ConfigModule.UiLayout, ConfigModule.KeyBindings, ConfigModule.DisplayChatAddon });
 
         Assert.True(File.Exists(Path.Combine(targetPath, "ui_layout.ini")));
+        Assert.Equal("safe ui", File.ReadAllText(Path.Combine(targetPath, "ui_layout.ini")));
+        Assert.Equal("old ui", File.ReadAllText(Assert.Single(Directory.GetFiles(targetPath, "ui_layout.ini.*.bak"))));
         Assert.False(File.Exists(Path.Combine(targetPath, "macro.txt")));
         Assert.False(File.Exists(Path.Combine(targetPath, "userpreferences.jx3dat")));
         Assert.False(File.Exists(Path.Combine(targetPath, "userpreferences", "role.dump")));
@@ -231,6 +344,7 @@ public sealed class CoreServiceTests
             source,
             new[] { ConfigModule.ActionButtons },
             "同门派",
+            null,
             "skill placement");
 
         var manifest = backupService.ReadManifest(backup.PackagePath);
@@ -243,6 +357,69 @@ public sealed class CoreServiceTests
         Assert.Contains("[\"ActionBar1_Page1/1\"]={5,9005}", restored);
         Assert.Contains("[\"ActionBar2_Page1/2\"]={}", restored);
         Assert.Contains("[\"Other\"]={9}", restored);
+    }
+
+    [Fact]
+    public void AutoSnapshot_Adds_Character_History_Without_Creating_SaveSlot()
+    {
+        using var temp = new TempWorkspace();
+        var repository = CreateRepository(temp.Root);
+        var profile = repository.GetProfiles().Single();
+        var backupService = CreateBackupService(temp.Root, repository);
+
+        var targetPath = Path.Combine(temp.Root, "target");
+        Directory.CreateDirectory(targetPath);
+        File.WriteAllText(Path.Combine(targetPath, "ui_layout.ini"), "safe ui");
+
+        var target = new CharacterConfig("acc", "server", "targetRole", targetPath, Array.Empty<string>());
+
+        var snapshot = backupService.CreateAutoSnapshot(profile, target, "before restore");
+        var versions = repository.GetRecentBackups(profile.Id);
+
+        Assert.Equal(0, snapshot.SlotNumber);
+        Assert.Equal(SaveKind.AutoSnapshot, snapshot.Kind);
+        Assert.Empty(repository.GetSlots(profile.Id));
+        Assert.Contains(versions, version =>
+            version.Kind == SaveKind.AutoSnapshot
+            && version.SlotNumber == 0
+            && version.SourcePath == targetPath);
+    }
+
+    [Fact]
+    public void CrossCharacter_Copy_Creates_Target_Snapshot_And_Uses_Selected_Modules()
+    {
+        using var temp = new TempWorkspace();
+        var repository = CreateRepository(temp.Root);
+        var profile = repository.GetProfiles().Single();
+        var backupService = CreateBackupService(temp.Root, repository);
+
+        var sourcePath = Path.Combine(temp.Root, "source");
+        var targetPath = Path.Combine(temp.Root, "target");
+        Directory.CreateDirectory(sourcePath);
+        Directory.CreateDirectory(targetPath);
+        File.WriteAllText(Path.Combine(sourcePath, "ui_layout.ini"), "source ui");
+        File.WriteAllText(Path.Combine(sourcePath, "macro.txt"), "source macro");
+        File.WriteAllText(Path.Combine(targetPath, "ui_layout.ini"), "target ui");
+
+        var source = new CharacterConfig("acc", "server", "sourceRole", sourcePath, Array.Empty<string>());
+        var target = new CharacterConfig("acc", "server", "targetRole", targetPath, Array.Empty<string>());
+
+        backupService.CopyCharacterConfig(
+            profile,
+            source,
+            target,
+            new[] { ConfigModule.UiLayout },
+            "copy safe modules");
+
+        var versions = repository.GetRecentBackups(profile.Id);
+
+        Assert.Equal("source ui", File.ReadAllText(Path.Combine(targetPath, "ui_layout.ini")));
+        Assert.False(File.Exists(Path.Combine(targetPath, "macro.txt")));
+        Assert.Empty(repository.GetSlots(profile.Id));
+        Assert.Contains(versions, version =>
+            version.Kind == SaveKind.AutoSnapshot
+            && version.SlotNumber == 0
+            && version.SourcePath == targetPath);
     }
 
     private static BackupService CreateBackupService(string root, ProfileRepository repository)
