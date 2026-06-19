@@ -6,24 +6,24 @@
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="ClearType">
     <UserControl.Resources>
-        <SolidColorBrush x:Key="AppBackground" Color="#17151A"/>
-        <SolidColorBrush x:Key="PanelBrush" Color="#2A2730"/>
-        <SolidColorBrush x:Key="PanelAltBrush" Color="#211F26"/>
-        <SolidColorBrush x:Key="InputBrush" Color="#151820"/>
-        <SolidColorBrush x:Key="InputHoverBrush" Color="#202333"/>
-        <SolidColorBrush x:Key="LineBrush" Color="#47414F"/>
-        <SolidColorBrush x:Key="LineStrongBrush" Color="#5D5668"/>
-        <SolidColorBrush x:Key="AccentBrush" Color="#C9B4FF"/>
-        <SolidColorBrush x:Key="AccentTextBrush" Color="#11131A"/>
-        <SolidColorBrush x:Key="AccentSoftBrush" Color="#3B334D"/>
+        <SolidColorBrush x:Key="AppBackground" Color="#111821"/>
+        <SolidColorBrush x:Key="PanelBrush" Color="#1A232D"/>
+        <SolidColorBrush x:Key="PanelAltBrush" Color="#151D26"/>
+        <SolidColorBrush x:Key="InputBrush" Color="#101720"/>
+        <SolidColorBrush x:Key="InputHoverBrush" Color="#1D2C3A"/>
+        <SolidColorBrush x:Key="LineBrush" Color="#2F4658"/>
+        <SolidColorBrush x:Key="LineStrongBrush" Color="#48667A"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#6ED7FF"/>
+        <SolidColorBrush x:Key="AccentTextBrush" Color="#071018"/>
+        <SolidColorBrush x:Key="AccentSoftBrush" Color="#18384A"/>
         <SolidColorBrush x:Key="DangerBrush" Color="#F05D6A"/>
         <SolidColorBrush x:Key="DangerSoftBrush" Color="#4A1E28"/>
         <SolidColorBrush x:Key="TextBrush" Color="#E8EEF8"/>
         <SolidColorBrush x:Key="MutedBrush" Color="#99A6BA"/>
         <SolidColorBrush x:Key="SubtleBrush" Color="#6F7D91"/>
-        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#C9B4FF"/>
-        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#11131A"/>
-        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#3B334D"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#6ED7FF"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#071018"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#18384A"/>
         <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="#FFFFFF"/>
 
         <Style TargetType="TextBlock">
@@ -382,7 +382,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="16"
+                                CornerRadius="8,8,2,2"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter ContentSource="Header"/>
                         </Border>
@@ -405,31 +405,32 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <StackPanel Grid.Row="0"
+                    Panel.ZIndex="5"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Margin="0,0,4,0">
+            <TextBlock Text="Profile"
+                       VerticalAlignment="Center"
+                       Margin="0,0,8,0"
+                       Foreground="{StaticResource MutedBrush}"
+                       FontWeight="SemiBold"/>
+            <ComboBox Width="150"
+                      ItemsSource="{Binding Profiles}"
+                      SelectedItem="{Binding SelectedProfile}"
+                      ItemTemplate="{StaticResource ProfileTemplate}"/>
+        </StackPanel>
+
         <TabControl Grid.Row="0" Margin="0,0,0,12">
             <TabItem Header="备份 / 历史">
         <Grid Margin="0,14,0,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="170"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="310"/>
+                <ColumnDefinition Width="340"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,12,0">
-                <DockPanel LastChildFill="True">
-                    <StackPanel DockPanel.Dock="Top">
-                        <TextBlock Text="用户 Profile" Style="{StaticResource SectionTitle}"/>
-                        <Button Content="+ 新建用户"
-                                Margin="0,14,0,12"
-                                Command="{Binding CreateProfileCommand}"
-                                Style="{StaticResource PrimaryButton}"/>
-                    </StackPanel>
-                    <ListBox ItemsSource="{Binding Profiles}"
-                             SelectedItem="{Binding SelectedProfile}"
-                             ItemTemplate="{StaticResource ProfileTemplate}"/>
-                </DockPanel>
-            </Border>
-
-            <Grid Grid.Column="1" Margin="0,0,12,0">
+            <Grid Grid.Column="0" Margin="0,0,12,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="1.25*"/>
@@ -573,7 +574,7 @@
                 </Border>
             </Grid>
 
-            <Border Grid.Column="2" Style="{StaticResource Card}">
+            <Border Grid.Column="1" Style="{StaticResource Card}">
                 <DockPanel LastChildFill="True">
                     <StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
                         <TextBlock Text="备份 / 恢复" Style="{StaticResource SectionTitle}"/>

@@ -600,9 +600,24 @@ public sealed partial class MainViewModel : ObservableObject
         });
     }
 
+    public void ReloadProfilesFromHost()
+    {
+        LoadProfiles();
+    }
+
     private void LoadProfiles()
     {
         Profiles.Clear();
+        var existingProfiles = _repository.GetProfiles().ToList();
+        foreach (var name in _profileHostApi.GetHostProfileNames()
+                     .Where(name => !string.IsNullOrWhiteSpace(name))
+                     .Select(name => name.Trim())
+                     .Distinct(StringComparer.OrdinalIgnoreCase)
+                     .Where(name => existingProfiles.All(profile => !string.Equals(profile.Name, name, StringComparison.OrdinalIgnoreCase))))
+        {
+            _repository.CreateProfile(name);
+        }
+
         foreach (var profile in _repository.GetProfiles())
         {
             Profiles.Add(profile);

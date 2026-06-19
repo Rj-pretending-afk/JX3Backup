@@ -12,6 +12,8 @@ public interface IBackupProfileHostApi
     void OnProfileCreated(ProfileRecord profile);
 
     IReadOnlySet<string> GetOwnedCharacterKeys(string profileName);
+
+    IReadOnlyList<string> GetHostProfileNames();
 }
 
 public sealed class DialogBackupProfileHostApi : IBackupProfileHostApi
@@ -28,5 +30,10 @@ public sealed class DialogBackupProfileHostApi : IBackupProfileHostApi
     public IReadOnlySet<string> GetOwnedCharacterKeys(string profileName)
     {
         return new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+    }
+
+    public IReadOnlyList<string> GetHostProfileNames()
+    {
+        return Array.Empty<string>();
     }
 }

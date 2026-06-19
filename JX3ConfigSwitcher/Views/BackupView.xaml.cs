@@ -20,11 +20,15 @@ public partial class BackupView : UserControl
 
     public void ApplyAccent(Color accent)
     {
-        var softAccent = Blend(accent, Color.FromRgb(34, 31, 39), 0.78);
-        var panel = Blend(Complement(accent), Color.FromRgb(37, 34, 43), 0.9);
-        var panelAlt = Blend(Complement(accent), Color.FromRgb(28, 27, 34), 0.92);
-        var input = Blend(Complement(accent), Color.FromRgb(18, 21, 27), 0.9);
-        var line = Blend(accent, Color.FromRgb(68, 63, 76), 0.66);
+        var shellBackground = Color.FromRgb(17, 24, 33);
+        var panelBase = Color.FromRgb(26, 35, 45);
+        var panelAltBase = Color.FromRgb(21, 29, 38);
+        var inputBase = Color.FromRgb(16, 23, 32);
+        var softAccent = Blend(accent, Color.FromRgb(24, 56, 74), 0.72);
+        var panel = Blend(accent, panelBase, 0.9);
+        var panelAlt = Blend(accent, panelAltBase, 0.93);
+        var input = Blend(accent, inputBase, 0.95);
+        var line = Blend(accent, Color.FromRgb(47, 70, 88), 0.58);
 
         var accentText = UseDarkText(accent) ? Color.FromRgb(17, 19, 26) : Colors.White;
 
@@ -37,7 +41,7 @@ public partial class BackupView : UserControl
         SetBrush("InputHoverBrush", Blend(accent, input, 0.82));
         SetBrush("LineBrush", line);
         SetBrush("LineStrongBrush", Blend(accent, Color.FromRgb(90, 84, 101), 0.58));
-        SetBrush("AppBackground", Blend(Complement(accent), Color.FromRgb(22, 20, 25), 0.86));
+        SetBrush("AppBackground", Blend(accent, shellBackground, 0.92));
         SetBrush(SystemColors.HighlightBrushKey, softAccent);
         SetBrush(SystemColors.InactiveSelectionHighlightBrushKey, softAccent);
         SetBrush(SystemColors.HighlightTextBrushKey, accentText);
@@ -162,9 +166,6 @@ public partial class BackupView : UserControl
 
         Resources[key] = new SolidColorBrush(color);
     }
-
-    private static Color Complement(Color color) =>
-        Color.FromRgb((byte)(255 - color.R), (byte)(255 - color.G), (byte)(255 - color.B));
 
     private static Color Blend(Color source, Color target, double targetWeight)
     {
