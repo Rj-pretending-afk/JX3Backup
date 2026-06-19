@@ -75,6 +75,68 @@ public static class SectCatalog
 
     public static SectOption Default => Options[0];
 
+    private static readonly IReadOnlyDictionary<int, string> ForceNames = new Dictionary<int, string>
+    {
+        [0] = "江湖",
+        [1] = "少林",
+        [2] = "万花",
+        [3] = "天策",
+        [4] = "纯阳",
+        [5] = "七秀",
+        [6] = "五毒",
+        [7] = "唐门",
+        [8] = "藏剑",
+        [9] = "丐帮",
+        [10] = "明教",
+        [21] = "苍云",
+        [22] = "长歌",
+        [23] = "霸刀",
+        [24] = "蓬莱",
+        [25] = "凌雪阁",
+        [211] = "衍天宗",
+        [212] = "药宗",
+        [213] = "刀宗",
+        [214] = "万灵",
+        [215] = "段氏"
+    };
+
+    private static readonly IReadOnlyDictionary<int, string> KungfuNames = new Dictionary<int, string>
+    {
+        [10002] = "洗髓经",
+        [10003] = "易筋经",
+        [10014] = "紫霞功",
+        [10015] = "太虚剑意",
+        [10021] = "花间游",
+        [10028] = "离经易道",
+        [10026] = "傲血战意",
+        [10062] = "铁牢律",
+        [10080] = "云裳心经",
+        [10081] = "冰心诀",
+        [10144] = "问水诀",
+        [10145] = "山居剑意",
+        [10175] = "毒经",
+        [10176] = "补天诀",
+        [10224] = "惊羽诀",
+        [10225] = "天罗诡道",
+        [10242] = "焚影圣诀",
+        [10243] = "明尊琉璃体",
+        [10268] = "笑尘诀",
+        [10389] = "铁骨衣",
+        [10390] = "分山劲",
+        [10447] = "莫问",
+        [10448] = "相知",
+        [10464] = "北傲诀",
+        [10533] = "凌海诀",
+        [10585] = "隐龙诀",
+        [10615] = "太玄经",
+        [10626] = "灵素",
+        [10627] = "无方",
+        [10698] = "孤锋诀",
+        [10756] = "山海心诀",
+        [10786] = "周天功",
+        [10821] = "幽罗引"
+    };
+
     public static SectOption? Find(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -96,6 +158,23 @@ public static class SectCatalog
         }
 
         return Options.FirstOrDefault(option => EqualsToken(option.Color, color));
+    }
+
+    public static SectOption? FindByKungfuId(int? kungfuId)
+    {
+        if (kungfuId is null || !KungfuNames.TryGetValue(kungfuId.Value, out var name))
+        {
+            return null;
+        }
+
+        return Find(name);
+    }
+
+    public static string? GetSectByForceId(int? forceId)
+    {
+        return forceId is not null && ForceNames.TryGetValue(forceId.Value, out var name)
+            ? name
+            : null;
     }
 
     public static SectOption? DetectFromText(string text)

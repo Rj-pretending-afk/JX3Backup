@@ -1,5 +1,6 @@
 using JX3ConfigSwitcher.Models;
 using JX3ConfigSwitcher.Services;
+using Microsoft.Data.Sqlite;
 
 namespace JX3ConfigSwitcher.Tests;
 
@@ -185,6 +186,94 @@ public sealed class CoreServiceTests
         Assert.Equal("万花", character.Sect);
         Assert.Equal("花间游", character.Kungfu);
         Assert.Equal(123456, character.EquipmentScore);
+    }
+
+    [Fact]
+    public void Scanner_Reads_MingYi_Equip_Stat_Database()
+    {
+        using var temp = new TempWorkspace();
+        var characterPath = Path.Combine(temp.Root, "userdata", "accountA", "serverA", "roleA");
+        Directory.CreateDirectory(characterPath);
+        File.WriteAllText(Path.Combine(characterPath, "custom.dat"), "ui");
+
+        var statsRoot = Path.Combine(temp.Root, "interface", "MY#DATA", "!all-users@zhcn_hd", "userdata", "role_statistics");
+        Directory.CreateDirectory(statsRoot);
+        var dbPath = Path.Combine(statsRoot, "equip_stat.v4.db");
+        using (var connection = new SqliteConnection($"Data Source={dbPath};Pooling=False"))
+        {
+            connection.Open();
+            using var create = connection.CreateCommand();
+            create.CommandText = """
+                CREATE TABLE OwnerInfo (
+                    ownerkey TEXT NOT NULL,
+                    ownername TEXT NOT NULL,
+                    servername TEXT NOT NULL,
+                    ownerforce INTEGER NOT NULL,
+                    ownerrole INTEGER NOT NULL,
+                    ownerlevel INTEGER NOT NULL,
+                    ownerscore TEXT NOT NULL,
+                    ownersuitindex INTEGER NOT NULL,
+                    time INTEGER NOT NULL,
+                    extra TEXT NOT NULL,
+                    PRIMARY KEY(ownerkey)
+                );
+                INSERT INTO OwnerInfo VALUES ('guid-roleA', 'roleA', 'serverA', 2, 1, 120, '{[2]=98765}', 2, 1000, '');
+                """;
+            create.ExecuteNonQuery();
+        }
+
+        var scanner = new GameScanner(Array.Empty<string>(), () => Array.Empty<string>());
+        var character = Assert.Single(scanner.ScanCharacters(temp.Root));
+
+        Assert.Equal("万花", character.Sect);
+        Assert.Null(character.Kungfu);
+        Assert.Equal(98765, character.EquipmentScore);
+    }
+
+    [Fact]
+    public void Scanner_Reads_MingYi_Role_Stat_Kungfu_Id()
+    {
+        using var temp = new TempWorkspace();
+        var characterPath = Path.Combine(temp.Root, "userdata", "accountA", "serverA", "roleA");
+        Directory.CreateDirectory(characterPath);
+        File.WriteAllText(Path.Combine(characterPath, "custom.dat"), "ui");
+
+        var statsRoot = Path.Combine(temp.Root, "interface", "MY#DATA", "!all-users@zhcn_hd", "userdata", "role_statistics");
+        Directory.CreateDirectory(statsRoot);
+        File.WriteAllText(
+            Path.Combine(statsRoot, "role_stat.jx3dat"),
+            """
+            return {
+              ["guid-roleA"] = { name = "roleA", force = 2, dwActualKungfuID = 10021, equip_score = 12345 }
+            }
+            """);
+
+        var scanner = new GameScanner(Array.Empty<string>(), () => Array.Empty<string>());
+        var character = Assert.Single(scanner.ScanCharacters(temp.Root));
+
+        Assert.Equal("万花", character.Sect);
+        Assert.Equal("花间游", character.Kungfu);
+        Assert.Equal(12345, character.EquipmentScore);
+    }
+
+    [Fact]
+    public void Scanner_Does_Not_Guess_Metadata_From_Unrelated_Text()
+    {
+        using var temp = new TempWorkspace();
+        var characterPath = Path.Combine(temp.Root, "userdata", "accountA", "serverA", "roleA");
+        Directory.CreateDirectory(characterPath);
+        Directory.CreateDirectory(Path.Combine(temp.Root, "userdata", "accountA", "MingYi"));
+        File.WriteAllText(Path.Combine(characterPath, "custom.dat"), "ui");
+        File.WriteAllText(
+            Path.Combine(temp.Root, "userdata", "accountA", "MingYi", "notes.txt"),
+            "万花 花间游 score 99999");
+
+        var scanner = new GameScanner(Array.Empty<string>(), () => Array.Empty<string>());
+        var character = Assert.Single(scanner.ScanCharacters(temp.Root));
+
+        Assert.Null(character.Sect);
+        Assert.Null(character.Kungfu);
+        Assert.Null(character.EquipmentScore);
     }
 
     [Fact]
