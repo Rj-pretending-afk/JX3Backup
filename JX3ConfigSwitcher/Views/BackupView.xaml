@@ -476,6 +476,11 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <DockPanel Margin="0,0,0,10">
+                            <CheckBox DockPanel.Dock="Right"
+                                      IsChecked="{Binding ShowCurrentProfileOnly}"
+                                      Content="只看当前 Profile 已分配角色"
+                                      Foreground="{StaticResource TextBrush}"
+                                      VerticalAlignment="Center"/>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="角色列表" Style="{StaticResource SectionTitle}"/>
                                 <TextBlock Text="{Binding Characters.Count, StringFormat={}{0} 个角色}"

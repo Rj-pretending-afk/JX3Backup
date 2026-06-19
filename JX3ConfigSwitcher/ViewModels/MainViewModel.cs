@@ -24,6 +24,7 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly BackupService _backupService;
     private readonly SyncService _syncService;
     private readonly IBackupProfileHostApi _profileHostApi;
+    private readonly List<CharacterConfig> _allCharacters = new();
 
     public MainViewModel(
         PortablePaths paths,
@@ -104,6 +105,9 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private bool isBusy;
 
+    [ObservableProperty]
+    private bool showCurrentProfileOnly;
+
     public string DataDirectory => _paths.DataDirectory;
 
     public double WindowWidth => _settingsService.Settings.WindowWidth;
@@ -144,8 +148,14 @@ public sealed partial class MainViewModel : ObservableObject
     {
         _settingsService.Settings.CurrentProfileId = value?.Id;
         _settingsService.Save();
+        ApplyCharacterFilter();
         BuildSlotGrid();
         RefreshRecentBackups();
+    }
+
+    partial void OnShowCurrentProfileOnlyChanged(bool value)
+    {
+        ApplyCharacterFilter();
     }
 
     partial void OnSelectedSlotChanged(SlotViewModel? value)
@@ -287,21 +297,44 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void ScanCharacters()
     {
-        Characters.Clear();
+        _allCharacters.Clear();
         if (string.IsNullOrWhiteSpace(GamePath))
         {
+            Characters.Clear();
             StatusMessage = "未设置游戏路径。";
             return;
         }
 
         foreach (var character in _scanner.ScanCharacters(GamePath))
         {
+            _allCharacters.Add(character);
+        }
+
+        ApplyCharacterFilter();
+        CrossSourceCharacter = null;
+        StatusMessage = $"扫描完成：{Characters.Count} 个角色。";
+    }
+
+    private void ApplyCharacterFilter()
+    {
+        var selectedKey = SelectedCharacter?.Key;
+        Characters.Clear();
+
+        IEnumerable<CharacterConfig> source = _allCharacters;
+        if (ShowCurrentProfileOnly && SelectedProfile is not null)
+        {
+            var owned = _profileHostApi.GetOwnedCharacterKeys(SelectedProfile.Name);
+            source = source.Where(character => owned.Contains(character.Key));
+        }
+
+        foreach (var character in source)
+        {
             Characters.Add(character);
         }
 
-        SelectedCharacter = Characters.FirstOrDefault();
+        SelectedCharacter = Characters.FirstOrDefault(character => string.Equals(character.Key, selectedKey, StringComparison.OrdinalIgnoreCase))
+            ?? Characters.FirstOrDefault();
         CrossSourceCharacter = null;
-        StatusMessage = $"扫描完成：{Characters.Count} 个角色。";
     }
 
     [RelayCommand]

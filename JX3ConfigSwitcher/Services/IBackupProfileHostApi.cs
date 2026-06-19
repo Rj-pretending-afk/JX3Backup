@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using JX3ConfigSwitcher.Models;
 using JX3ConfigSwitcher.Views;
@@ -9,6 +10,8 @@ public interface IBackupProfileHostApi
     string? RequestCreateProfileName(IReadOnlyList<ProfileRecord> existingProfiles);
 
     void OnProfileCreated(ProfileRecord profile);
+
+    IReadOnlySet<string> GetOwnedCharacterKeys(string profileName);
 }
 
 public sealed class DialogBackupProfileHostApi : IBackupProfileHostApi
@@ -20,5 +23,10 @@ public sealed class DialogBackupProfileHostApi : IBackupProfileHostApi
 
     public void OnProfileCreated(ProfileRecord profile)
     {
+    }
+
+    public IReadOnlySet<string> GetOwnedCharacterKeys(string profileName)
+    {
+        return new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     }
 }
