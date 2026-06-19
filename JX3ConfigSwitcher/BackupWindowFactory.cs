@@ -1,12 +1,33 @@
 using System.Windows;
+using System.Windows.Controls;
 using JX3ConfigSwitcher.Services;
 using JX3ConfigSwitcher.ViewModels;
+using JX3ConfigSwitcher.Views;
 
 namespace JX3ConfigSwitcher;
 
 public static class BackupWindowFactory
 {
     public static MainWindow CreateWindow(string? baseDirectory = null, IBackupProfileHostApi? profileHostApi = null)
+    {
+        var viewModel = BuildViewModel(baseDirectory, profileHostApi);
+        return new MainWindow(viewModel)
+        {
+            Width = viewModel.WindowWidth,
+            Height = viewModel.WindowHeight
+        };
+    }
+
+    public static UserControl CreateView(string? baseDirectory = null, IBackupProfileHostApi? hostApi = null)
+    {
+        var viewModel = BuildViewModel(baseDirectory, hostApi);
+        return new BackupView
+        {
+            DataContext = viewModel
+        };
+    }
+
+    private static MainViewModel BuildViewModel(string? baseDirectory = null, IBackupProfileHostApi? profileHostApi = null)
     {
         var paths = new PortablePaths(baseDirectory);
         paths.EnsureCreated();
@@ -27,12 +48,7 @@ public static class BackupWindowFactory
         var syncService = new SyncService(repository);
         var viewModel = new MainViewModel(paths, settings, repository, scanner, classifier, backupService, syncService, profileHostApi);
         viewModel.Initialize();
-
-        return new MainWindow(viewModel, settings)
-        {
-            Width = settings.Settings.WindowWidth,
-            Height = settings.Settings.WindowHeight
-        };
+        return viewModel;
     }
 
     public static MainWindow ShowWindow(Window? owner = null, string? baseDirectory = null, IBackupProfileHostApi? profileHostApi = null)

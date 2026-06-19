@@ -106,6 +106,10 @@ public sealed partial class MainViewModel : ObservableObject
 
     public string DataDirectory => _paths.DataDirectory;
 
+    public double WindowWidth => _settingsService.Settings.WindowWidth;
+
+    public double WindowHeight => _settingsService.Settings.WindowHeight;
+
     public IReadOnlyList<SaveKind> SaveKinds { get; } = new[] { SaveKind.CharacterSpecific };
 
     public IReadOnlyList<SectOption> SectOptions => SectCatalog.All;
@@ -119,6 +123,21 @@ public sealed partial class MainViewModel : ObservableObject
         RefreshRecentBackups();
         RefreshLogs();
         ScanGamePaths();
+    }
+
+    public void SaveAndDispose(double? windowWidth = null, double? windowHeight = null)
+    {
+        if (windowWidth is > 0)
+        {
+            _settingsService.Settings.WindowWidth = windowWidth.Value;
+        }
+
+        if (windowHeight is > 0)
+        {
+            _settingsService.Settings.WindowHeight = windowHeight.Value;
+        }
+
+        _settingsService.Save();
     }
 
     partial void OnSelectedProfileChanged(ProfileRecord? value)
