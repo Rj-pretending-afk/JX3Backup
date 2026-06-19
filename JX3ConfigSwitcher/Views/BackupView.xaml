@@ -6,24 +6,25 @@
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="ClearType">
     <UserControl.Resources>
-        <SolidColorBrush x:Key="AppBackground" Color="#0F141B"/>
-        <SolidColorBrush x:Key="PanelBrush" Color="#151B24"/>
-        <SolidColorBrush x:Key="PanelAltBrush" Color="#111821"/>
-        <SolidColorBrush x:Key="InputBrush" Color="#0F1620"/>
-        <SolidColorBrush x:Key="InputHoverBrush" Color="#172232"/>
-        <SolidColorBrush x:Key="LineBrush" Color="#2B3544"/>
-        <SolidColorBrush x:Key="LineStrongBrush" Color="#3B4960"/>
-        <SolidColorBrush x:Key="AccentBrush" Color="#2F80ED"/>
-        <SolidColorBrush x:Key="AccentSoftBrush" Color="#183B62"/>
+        <SolidColorBrush x:Key="AppBackground" Color="#17151A"/>
+        <SolidColorBrush x:Key="PanelBrush" Color="#2A2730"/>
+        <SolidColorBrush x:Key="PanelAltBrush" Color="#211F26"/>
+        <SolidColorBrush x:Key="InputBrush" Color="#151820"/>
+        <SolidColorBrush x:Key="InputHoverBrush" Color="#202333"/>
+        <SolidColorBrush x:Key="LineBrush" Color="#47414F"/>
+        <SolidColorBrush x:Key="LineStrongBrush" Color="#5D5668"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#C9B4FF"/>
+        <SolidColorBrush x:Key="AccentTextBrush" Color="#11131A"/>
+        <SolidColorBrush x:Key="AccentSoftBrush" Color="#3B334D"/>
         <SolidColorBrush x:Key="DangerBrush" Color="#F05D6A"/>
         <SolidColorBrush x:Key="DangerSoftBrush" Color="#4A1E28"/>
         <SolidColorBrush x:Key="TextBrush" Color="#E8EEF8"/>
         <SolidColorBrush x:Key="MutedBrush" Color="#99A6BA"/>
         <SolidColorBrush x:Key="SubtleBrush" Color="#6F7D91"/>
-        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#183B62"/>
-        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#E8EEF8"/>
-        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#183B62"/>
-        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="#E8EEF8"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#C9B4FF"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#11131A"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#3B334D"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="#FFFFFF"/>
 
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
@@ -34,12 +35,17 @@
             <Setter Property="Background" Value="{StaticResource PanelBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Padding" Value="14"/>
+            <Setter Property="CornerRadius" Value="18"/>
+            <Setter Property="Padding" Value="18"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#000000" BlurRadius="18" ShadowDepth="4" Opacity="0.28"/>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <Style x:Key="SectionTitle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="17"/>
+            <Setter Property="FontSize" Value="18"/>
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
 
@@ -50,11 +56,11 @@
 
         <Style TargetType="Button">
             <Setter Property="Foreground" Value="#FFFFFF"/>
-            <Setter Property="Background" Value="#1A2432"/>
+            <Setter Property="Background" Value="{StaticResource PanelAltBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource LineStrongBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="12,8"/>
-            <Setter Property="MinHeight" Value="38"/>
+            <Setter Property="MinHeight" Value="40"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
@@ -64,14 +70,14 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="8">
+                                CornerRadius="15">
                             <ContentPresenter HorizontalAlignment="Center"
                                               VerticalAlignment="Center"
                                               Margin="{TemplateBinding Padding}"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="#223047"/>
+                                <Setter TargetName="Root" Property="Background" Value="{StaticResource InputHoverBrush}"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="Root" Property="Opacity" Value="0.45"/>
@@ -84,7 +90,8 @@
 
         <Style x:Key="PrimaryButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
             <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
-            <Setter Property="BorderBrush" Value="#58A4FF"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentTextBrush}"/>
         </Style>
 
         <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
@@ -99,7 +106,7 @@
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="12,8"/>
             <Setter Property="CaretBrush" Value="{StaticResource AccentBrush}"/>
-            <Setter Property="MinHeight" Value="38"/>
+            <Setter Property="MinHeight" Value="40"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
@@ -107,7 +114,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="8">
+                                CornerRadius="14">
                             <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -128,7 +135,7 @@
             <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource LineStrongBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="MinHeight" Value="38"/>
+            <Setter Property="MinHeight" Value="40"/>
             <Setter Property="Padding" Value="8,4"/>
         </Style>
 
@@ -142,8 +149,8 @@
                     <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
                 </Trigger>
                 <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="{StaticResource AccentSoftBrush}"/>
-                    <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                    <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                    <Setter Property="Foreground" Value="{StaticResource AccentTextBrush}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -161,7 +168,7 @@
                                 Background="{Binding Color}"
                                 BorderBrush="{StaticResource LineBrush}"
                                 BorderThickness="1"
-                                CornerRadius="6">
+                                CornerRadius="12">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="4"/>
@@ -191,7 +198,7 @@
         </Style>
 
         <Style x:Key="SectComboBoxStyle" TargetType="ComboBox">
-            <Setter Property="MinHeight" Value="38"/>
+            <Setter Property="MinHeight" Value="40"/>
             <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
             <Setter Property="ItemContainerStyle" Value="{StaticResource SectComboBoxItemStyle}"/>
             <Setter Property="Template">
@@ -205,11 +212,11 @@
                                 <ToggleButton.Template>
                                     <ControlTemplate TargetType="ToggleButton">
                                         <Border x:Name="SelectionRoot"
-                                                MinHeight="38"
+                                                MinHeight="40"
                                                 Background="{Binding SelectedItem.Color, RelativeSource={RelativeSource AncestorType=ComboBox}}"
                                                 BorderBrush="{StaticResource LineStrongBrush}"
                                                 BorderThickness="1"
-                                                CornerRadius="8"
+                                                CornerRadius="14"
                                                 Padding="12,8">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
@@ -246,7 +253,7 @@
                                         Background="{StaticResource PanelBrush}"
                                         BorderBrush="{StaticResource LineStrongBrush}"
                                         BorderThickness="1"
-                                        CornerRadius="8"
+                                        CornerRadius="14"
                                         Padding="4">
                                     <ScrollViewer CanContentScroll="True">
                                         <ItemsPresenter/>
@@ -283,17 +290,18 @@
                                 Background="Transparent"
                                 BorderBrush="Transparent"
                                 BorderThickness="1"
-                                CornerRadius="8"
+                                CornerRadius="14"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="#192333"/>
+                                <Setter TargetName="Root" Property="Background" Value="{StaticResource InputHoverBrush}"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="{StaticResource AccentSoftBrush}"/>
+                                <Setter TargetName="Root" Property="Background" Value="{StaticResource AccentBrush}"/>
                                 <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                <Setter Property="Foreground" Value="{StaticResource AccentTextBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -307,15 +315,15 @@
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="GridLinesVisibility" Value="None"/>
             <Setter Property="HeadersVisibility" Value="Column"/>
-            <Setter Property="RowHeight" Value="36"/>
+            <Setter Property="RowHeight" Value="38"/>
             <Setter Property="ColumnHeaderHeight" Value="38"/>
             <Setter Property="RowBackground" Value="Transparent"/>
-            <Setter Property="AlternatingRowBackground" Value="#101821"/>
+            <Setter Property="AlternatingRowBackground" Value="#181A22"/>
             <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
         </Style>
 
         <Style TargetType="DataGridColumnHeader">
-            <Setter Property="Background" Value="#111821"/>
+            <Setter Property="Background" Value="{StaticResource PanelAltBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="10,7"/>
@@ -327,12 +335,12 @@
             <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#192333"/>
+                    <Setter Property="Background" Value="{StaticResource InputHoverBrush}"/>
                     <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
                 </Trigger>
                 <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="{StaticResource AccentSoftBrush}"/>
-                    <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                    <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                    <Setter Property="Foreground" Value="{StaticResource AccentTextBrush}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -345,7 +353,7 @@
             <Style.Triggers>
                 <Trigger Property="IsSelected" Value="True">
                     <Setter Property="Background" Value="Transparent"/>
-                    <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                    <Setter Property="Foreground" Value="{StaticResource AccentTextBrush}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -364,7 +372,7 @@
             <Setter Property="Background" Value="{StaticResource PanelAltBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="Padding" Value="18,10"/>
             <Setter Property="Margin" Value="0,0,6,0"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Template">
@@ -374,15 +382,15 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="8,8,0,0"
+                                CornerRadius="16"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter ContentSource="Header"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="{StaticResource AccentSoftBrush}"/>
+                                <Setter TargetName="Root" Property="Background" Value="{StaticResource AccentBrush}"/>
                                 <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
-                                <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                                <Setter Property="Foreground" Value="{StaticResource AccentTextBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -391,22 +399,22 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Background="Transparent" Margin="0">
+    <Grid Background="{StaticResource AppBackground}" Margin="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TabControl Grid.Row="0" Margin="0,0,0,10">
+        <TabControl Grid.Row="0" Margin="0,0,0,12">
             <TabItem Header="备份 / 历史">
-        <Grid Margin="0,8,0,0">
+        <Grid Margin="0,14,0,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="190"/>
+                <ColumnDefinition Width="170"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="340"/>
+                <ColumnDefinition Width="310"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,10,0">
+            <Border Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,12,0">
                 <DockPanel LastChildFill="True">
                     <StackPanel DockPanel.Dock="Top">
                         <TextBlock Text="用户 Profile" Style="{StaticResource SectionTitle}"/>
@@ -421,14 +429,14 @@
                 </DockPanel>
             </Border>
 
-            <Grid Grid.Column="1" Margin="0,0,10,0">
+            <Grid Grid.Column="1" Margin="0,0,12,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="1.25*"/>
                     <RowDefinition Height="1*"/>
                 </Grid.RowDefinitions>
 
-                <Border Grid.Row="0" Style="{StaticResource Card}" Margin="0,0,0,14">
+                <Border Grid.Row="0" Style="{StaticResource Card}" Margin="0,0,0,12">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -461,7 +469,7 @@
                     </Grid>
                 </Border>
 
-                <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,14">
+                <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,12">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -486,13 +494,13 @@
                                       IsReadOnly="True"
                                       SelectionMode="Single">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="账号" Binding="{Binding Account}" Width="0.9*"/>
-                                    <DataGridTextColumn Header="区服" Binding="{Binding Server}" Width="1.1*"/>
-                                    <DataGridTextColumn Header="角色" Binding="{Binding CharacterName}" Width="1*"/>
-                                    <DataGridTextColumn Header="门派" Binding="{Binding Sect}" Width="0.75*"/>
-                                    <DataGridTextColumn Header="心法" Binding="{Binding Kungfu}" Width="0.9*"/>
-                                    <DataGridTextColumn Header="装分" Binding="{Binding EquipmentScore}" Width="58"/>
-                                    <DataGridTextColumn Header="dump" Binding="{Binding DumpFiles.Count}" Width="58"/>
+                                    <DataGridTextColumn Header="账号" Binding="{Binding Account}" Width="0.75*"/>
+                                    <DataGridTextColumn Header="区服" Binding="{Binding Server}" Width="0.95*"/>
+                                    <DataGridTextColumn Header="角色" Binding="{Binding CharacterName}" Width="0.9*"/>
+                                    <DataGridTextColumn Header="门派" Binding="{Binding Sect}" Width="0.62*"/>
+                                    <DataGridTextColumn Header="心法" Binding="{Binding Kungfu}" Width="0.78*"/>
+                                    <DataGridTextColumn Header="装分" Binding="{Binding EquipmentScore}" Width="54"/>
+                                    <DataGridTextColumn Header="dump" Binding="{Binding DumpFiles.Count}" Width="50"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Border>
@@ -528,7 +536,7 @@
                                             Background="{StaticResource InputBrush}"
                                             BorderBrush="{StaticResource LineBrush}"
                                             BorderThickness="1"
-                                            CornerRadius="8"
+                                            CornerRadius="14"
                                             Padding="10">
                                         <Grid>
                                             <Grid.ColumnDefinitions>

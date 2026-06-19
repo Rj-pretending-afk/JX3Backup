@@ -18,6 +18,32 @@ public partial class BackupView : UserControl
         InitializeComponent();
     }
 
+    public void ApplyAccent(Color accent)
+    {
+        var softAccent = Blend(accent, Color.FromRgb(34, 31, 39), 0.78);
+        var panel = Blend(Complement(accent), Color.FromRgb(37, 34, 43), 0.9);
+        var panelAlt = Blend(Complement(accent), Color.FromRgb(28, 27, 34), 0.92);
+        var input = Blend(Complement(accent), Color.FromRgb(18, 21, 27), 0.9);
+        var line = Blend(accent, Color.FromRgb(68, 63, 76), 0.66);
+
+        var accentText = UseDarkText(accent) ? Color.FromRgb(17, 19, 26) : Colors.White;
+
+        SetBrush("AccentBrush", accent);
+        SetBrush("AccentTextBrush", accentText);
+        SetBrush("AccentSoftBrush", softAccent);
+        SetBrush("PanelBrush", panel);
+        SetBrush("PanelAltBrush", panelAlt);
+        SetBrush("InputBrush", input);
+        SetBrush("InputHoverBrush", Blend(accent, input, 0.82));
+        SetBrush("LineBrush", line);
+        SetBrush("LineStrongBrush", Blend(accent, Color.FromRgb(90, 84, 101), 0.58));
+        SetBrush("AppBackground", Blend(Complement(accent), Color.FromRgb(22, 20, 25), 0.86));
+        SetBrush(SystemColors.HighlightBrushKey, softAccent);
+        SetBrush(SystemColors.InactiveSelectionHighlightBrushKey, softAccent);
+        SetBrush(SystemColors.HighlightTextBrushKey, accentText);
+        SetBrush(SystemColors.InactiveSelectionHighlightTextBrushKey, Colors.White);
+    }
+
     private void SlotCard_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         _dragStartPoint = e.GetPosition(null);
@@ -124,6 +150,35 @@ public partial class BackupView : UserControl
                 ? (Brush)FindResource("AccentSoftBrush")
                 : (Brush)FindResource("InputBrush");
         }
+    }
+
+    private void SetBrush(object key, Color color)
+    {
+        if (Resources[key] is SolidColorBrush brush && !brush.IsFrozen)
+        {
+            brush.Color = color;
+            return;
+        }
+
+        Resources[key] = new SolidColorBrush(color);
+    }
+
+    private static Color Complement(Color color) =>
+        Color.FromRgb((byte)(255 - color.R), (byte)(255 - color.G), (byte)(255 - color.B));
+
+    private static Color Blend(Color source, Color target, double targetWeight)
+    {
+        var sourceWeight = 1 - targetWeight;
+        return Color.FromRgb(
+            (byte)((source.R * sourceWeight) + (target.R * targetWeight)),
+            (byte)((source.G * sourceWeight) + (target.G * targetWeight)),
+            (byte)((source.B * sourceWeight) + (target.B * targetWeight)));
+    }
+
+    private static bool UseDarkText(Color color)
+    {
+        var luminance = (0.2126 * color.R) + (0.7152 * color.G) + (0.0722 * color.B);
+        return luminance > 150;
     }
 
     private static void EnsureScaleTransform(FrameworkElement element)
