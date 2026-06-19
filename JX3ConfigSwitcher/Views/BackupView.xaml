@@ -6,14 +6,14 @@
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="ClearType">
     <UserControl.Resources>
-        <SolidColorBrush x:Key="AppBackground" Color="#111821"/>
-        <SolidColorBrush x:Key="PanelBrush" Color="#CC1A232D"/>
-        <SolidColorBrush x:Key="PanelAltBrush" Color="#B8151D26"/>
-        <SolidColorBrush x:Key="InputBrush" Color="#CC101720"/>
-        <SolidColorBrush x:Key="InputHoverBrush" Color="#D61D2C3A"/>
-        <SolidColorBrush x:Key="LineBrush" Color="#2F4658"/>
-        <SolidColorBrush x:Key="LineStrongBrush" Color="#48667A"/>
-        <SolidColorBrush x:Key="AccentBrush" Color="#6ED7FF"/>
+        <SolidColorBrush x:Key="AppBackground" Color="#303030"/>
+        <SolidColorBrush x:Key="PanelBrush" Color="#CC3A3A3A"/>
+        <SolidColorBrush x:Key="PanelAltBrush" Color="#B83F3F3F"/>
+        <SolidColorBrush x:Key="InputBrush" Color="#CC262626"/>
+        <SolidColorBrush x:Key="InputHoverBrush" Color="#D6474747"/>
+        <SolidColorBrush x:Key="LineBrush" Color="#595959"/>
+        <SolidColorBrush x:Key="LineStrongBrush" Color="#747474"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#C8A24B"/>
         <SolidColorBrush x:Key="AccentTextBrush" Color="#071018"/>
         <SolidColorBrush x:Key="AccentSoftBrush" Color="#80606A73"/>
         <SolidColorBrush x:Key="DangerBrush" Color="#F05D6A"/>

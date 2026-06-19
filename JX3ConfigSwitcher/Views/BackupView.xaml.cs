@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -20,19 +19,20 @@ public partial class BackupView : UserControl
     public BackupView()
     {
         InitializeComponent();
+        Loaded += (_, _) => ApplyCurrentShellAccent();
     }
 
     public void ApplyAccent(Color accent)
     {
-        var shellBackground = Color.FromRgb(17, 24, 33);
-        var panelBase = Color.FromRgb(26, 35, 45);
-        var panelAltBase = Color.FromRgb(21, 29, 38);
-        var inputBase = Color.FromRgb(16, 23, 32);
-        var softAccent = Blend(accent, Color.FromRgb(96, 106, 115), 0.82);
-        var panel = Blend(accent, panelBase, 0.9);
-        var panelAlt = Blend(accent, panelAltBase, 0.93);
-        var input = Blend(accent, inputBase, 0.95);
-        var line = Blend(accent, Color.FromRgb(47, 70, 88), 0.58);
+        var shellBackground = Color.FromRgb(48, 48, 48);
+        var panelBase = Color.FromRgb(58, 58, 58);
+        var panelAltBase = Color.FromRgb(63, 63, 63);
+        var inputBase = Color.FromRgb(38, 38, 38);
+        var softAccent = Blend(accent, Color.FromRgb(96, 96, 96), 0.86);
+        var panel = Blend(accent, panelBase, 0.96);
+        var panelAlt = Blend(accent, panelAltBase, 0.97);
+        var input = Blend(accent, inputBase, 0.98);
+        var line = Blend(accent, Color.FromRgb(89, 89, 89), 0.74);
 
         var accentText = UseDarkText(accent) ? Color.FromRgb(17, 19, 26) : Colors.White;
 
@@ -44,12 +44,20 @@ public partial class BackupView : UserControl
         SetBrush("InputBrush", WithAlpha(input, 204));
         SetBrush("InputHoverBrush", WithAlpha(Blend(accent, input, 0.82), 214));
         SetBrush("LineBrush", line);
-        SetBrush("LineStrongBrush", Blend(accent, Color.FromRgb(90, 84, 101), 0.58));
-        SetBrush("AppBackground", Blend(accent, shellBackground, 0.92));
+        SetBrush("LineStrongBrush", Blend(accent, Color.FromRgb(116, 116, 116), 0.68));
+        SetBrush("AppBackground", shellBackground);
         SetBrush(SystemColors.HighlightBrushKey, softAccent);
         SetBrush(SystemColors.InactiveSelectionHighlightBrushKey, softAccent);
         SetBrush(SystemColors.HighlightTextBrushKey, accentText);
         SetBrush(SystemColors.InactiveSelectionHighlightTextBrushKey, Colors.White);
+    }
+
+    private void ApplyCurrentShellAccent()
+    {
+        if (Application.Current.TryFindResource("PrimaryHueMidBrush") is SolidColorBrush brush)
+        {
+            ApplyAccent(brush.Color);
+        }
     }
 
     private void SlotCard_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -163,7 +171,8 @@ public partial class BackupView : UserControl
         _dragPopup = new Popup
         {
             AllowsTransparency = true,
-            Placement = PlacementMode.AbsolutePoint,
+            Placement = PlacementMode.RelativePoint,
+            PlacementTarget = this,
             IsHitTestVisible = false,
             PopupAnimation = PopupAnimation.Fade,
             Child = new Border
@@ -246,13 +255,9 @@ public partial class BackupView : UserControl
             return;
         }
 
-        if (!GetCursorPos(out var point))
-        {
-            return;
-        }
-
-        _dragPopup.HorizontalOffset = point.X + 14;
-        _dragPopup.VerticalOffset = point.Y + 18;
+        var point = Mouse.GetPosition(this);
+        _dragPopup.HorizontalOffset = point.X + 8;
+        _dragPopup.VerticalOffset = point.Y + 8;
     }
 
     private void StopDragPreview()
@@ -349,14 +354,4 @@ public partial class BackupView : UserControl
                 FillBehavior = FillBehavior.HoldEnd
             });
     }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct POINT
-    {
-        public int X;
-        public int Y;
-    }
-
-    [DllImport("user32.dll")]
-    private static extern bool GetCursorPos(out POINT lpPoint);
 }
