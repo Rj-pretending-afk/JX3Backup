@@ -7,10 +7,10 @@
         TextOptions.TextRenderingMode="ClearType">
     <UserControl.Resources>
         <SolidColorBrush x:Key="AppBackground" Color="#111821"/>
-        <SolidColorBrush x:Key="PanelBrush" Color="#1A232D"/>
-        <SolidColorBrush x:Key="PanelAltBrush" Color="#151D26"/>
-        <SolidColorBrush x:Key="InputBrush" Color="#101720"/>
-        <SolidColorBrush x:Key="InputHoverBrush" Color="#1D2C3A"/>
+        <SolidColorBrush x:Key="PanelBrush" Color="#CC1A232D"/>
+        <SolidColorBrush x:Key="PanelAltBrush" Color="#B8151D26"/>
+        <SolidColorBrush x:Key="InputBrush" Color="#CC101720"/>
+        <SolidColorBrush x:Key="InputHoverBrush" Color="#D61D2C3A"/>
         <SolidColorBrush x:Key="LineBrush" Color="#2F4658"/>
         <SolidColorBrush x:Key="LineStrongBrush" Color="#48667A"/>
         <SolidColorBrush x:Key="AccentBrush" Color="#6ED7FF"/>
@@ -29,24 +29,35 @@
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
             <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI, Arial"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#FFFFFF" BlurRadius="1.35" ShadowDepth="0" Opacity="0.28"/>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <Style x:Key="Card" TargetType="Border">
             <Setter Property="Background" Value="{StaticResource PanelBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="18"/>
+            <Setter Property="CornerRadius" Value="0"/>
             <Setter Property="Padding" Value="18"/>
             <Setter Property="Effect">
                 <Setter.Value>
-                    <DropShadowEffect Color="#000000" BlurRadius="18" ShadowDepth="4" Opacity="0.28"/>
+                    <DropShadowEffect Color="#000000" BlurRadius="16" ShadowDepth="4" Opacity="0.32"/>
                 </Setter.Value>
             </Setter>
         </Style>
 
         <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
             <Setter Property="FontSize" Value="18"/>
             <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#FFFFFF" BlurRadius="2.2" ShadowDepth="0" Opacity="0.38"/>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <Style x:Key="MutedText" TargetType="TextBlock">
@@ -70,7 +81,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="15">
+                                CornerRadius="0">
                             <ContentPresenter HorizontalAlignment="Center"
                                               VerticalAlignment="Center"
                                               Margin="{TemplateBinding Padding}"/>
@@ -89,9 +100,9 @@
         </Style>
 
         <Style x:Key="PrimaryButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-            <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="Background" Value="{StaticResource AccentSoftBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
-            <Setter Property="Foreground" Value="{StaticResource AccentTextBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
         </Style>
 
         <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
@@ -114,7 +125,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="14">
+                                CornerRadius="0">
                             <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -149,8 +160,8 @@
                     <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
                 </Trigger>
                 <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
-                    <Setter Property="Foreground" Value="{StaticResource AccentTextBrush}"/>
+                    <Setter Property="Background" Value="{StaticResource AccentSoftBrush}"/>
+                    <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -168,14 +179,14 @@
                                 Background="{Binding Color}"
                                 BorderBrush="{StaticResource LineBrush}"
                                 BorderThickness="1"
-                                CornerRadius="12">
+                                CornerRadius="0">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="4"/>
                                     <ColumnDefinition Width="8"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <Border Background="{Binding ContrastText}" CornerRadius="4" Opacity="0.5"/>
+                                <Border Background="{Binding ContrastText}" CornerRadius="0" Opacity="0.5"/>
                                 <TextBlock Grid.Column="2"
                                            Text="{Binding DisplayName}"
                                            Foreground="{Binding ContrastText}"
@@ -216,7 +227,7 @@
                                                 Background="{Binding SelectedItem.Color, RelativeSource={RelativeSource AncestorType=ComboBox}}"
                                                 BorderBrush="{StaticResource LineStrongBrush}"
                                                 BorderThickness="1"
-                                                CornerRadius="14"
+                                                CornerRadius="0"
                                                 Padding="12,8">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
@@ -253,7 +264,7 @@
                                         Background="{StaticResource PanelBrush}"
                                         BorderBrush="{StaticResource LineStrongBrush}"
                                         BorderThickness="1"
-                                        CornerRadius="14"
+                                        CornerRadius="0"
                                         Padding="4">
                                     <ScrollViewer CanContentScroll="True">
                                         <ItemsPresenter/>
@@ -290,7 +301,7 @@
                                 Background="Transparent"
                                 BorderBrush="Transparent"
                                 BorderThickness="1"
-                                CornerRadius="14"
+                                CornerRadius="0"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter/>
                         </Border>
@@ -299,9 +310,9 @@
                                 <Setter TargetName="Root" Property="Background" Value="{StaticResource InputHoverBrush}"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="{StaticResource AccentBrush}"/>
+                                <Setter TargetName="Root" Property="Background" Value="{StaticResource AccentSoftBrush}"/>
                                 <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
-                                <Setter Property="Foreground" Value="{StaticResource AccentTextBrush}"/>
+                                <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -339,8 +350,8 @@
                     <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
                 </Trigger>
                 <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
-                    <Setter Property="Foreground" Value="{StaticResource AccentTextBrush}"/>
+                    <Setter Property="Background" Value="{StaticResource AccentSoftBrush}"/>
+                    <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -353,7 +364,7 @@
             <Style.Triggers>
                 <Trigger Property="IsSelected" Value="True">
                     <Setter Property="Background" Value="Transparent"/>
-                    <Setter Property="Foreground" Value="{StaticResource AccentTextBrush}"/>
+                    <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -368,7 +379,7 @@
         </Style>
 
         <Style TargetType="TabItem">
-            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
             <Setter Property="Background" Value="{StaticResource PanelAltBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
@@ -382,15 +393,19 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="8,8,2,2"
+                                CornerRadius="0"
                                 Padding="{TemplateBinding Padding}">
-                            <ContentPresenter ContentSource="Header"/>
+                            <ContentPresenter ContentSource="Header">
+                                <ContentPresenter.Effect>
+                                    <DropShadowEffect Color="#FFFFFF" BlurRadius="2.4" ShadowDepth="0" Opacity="0.42"/>
+                                </ContentPresenter.Effect>
+                            </ContentPresenter>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="{StaticResource AccentBrush}"/>
+                                <Setter TargetName="Root" Property="Background" Value="{StaticResource AccentSoftBrush}"/>
                                 <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
-                                <Setter Property="Foreground" Value="{StaticResource AccentTextBrush}"/>
+                                <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -493,7 +508,7 @@
                                 Background="{StaticResource InputBrush}"
                                 BorderBrush="{StaticResource LineBrush}"
                                 BorderThickness="1"
-                                CornerRadius="8">
+                                CornerRadius="0">
                             <DataGrid ItemsSource="{Binding Characters}"
                                       SelectedItem="{Binding SelectedCharacter}"
                                       AutoGenerateColumns="False"
@@ -542,7 +557,7 @@
                                             Background="{StaticResource InputBrush}"
                                             BorderBrush="{StaticResource LineBrush}"
                                             BorderThickness="1"
-                                            CornerRadius="14"
+                                            CornerRadius="0"
                                             Padding="10">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
@@ -551,7 +566,7 @@
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="28"/>
                                             </Grid.ColumnDefinitions>
-                                            <Border Background="{Binding SectColor}" CornerRadius="4"/>
+                                            <Border Background="{Binding SectColor}" CornerRadius="0"/>
                                             <StackPanel Grid.Column="2">
                                                 <TextBlock Text="{Binding NumberText}" FontWeight="Bold"/>
                                                 <TextBlock Text="{Binding KindText}" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
@@ -599,7 +614,7 @@
                                     <ColumnDefinition Width="8"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <Border Background="{Binding SelectedSectOption.Color}" CornerRadius="4"/>
+                                <Border Background="{Binding SelectedSectOption.Color}" CornerRadius="0"/>
                                 <TextBlock Grid.Column="2"
                                            Text="{Binding SectTagDraft}"
                                            Foreground="{StaticResource MutedBrush}"
@@ -660,7 +675,7 @@
                             <Border Background="{StaticResource PanelAltBrush}"
                                     BorderBrush="{StaticResource LineBrush}"
                                     BorderThickness="1"
-                                    CornerRadius="8"
+                                    CornerRadius="0"
                                     Padding="12"
                                     Margin="0,16,0,0">
                                 <StackPanel>
@@ -687,7 +702,7 @@
                                             Background="#132235"
                                             BorderBrush="{StaticResource LineBrush}"
                                             BorderThickness="1"
-                                            CornerRadius="8">
+                                            CornerRadius="0">
                                         <TextBlock Text="{Binding RiskSummary}" TextWrapping="Wrap" Foreground="#C7D2E5"/>
                                     </Border>
                                 </StackPanel>
@@ -696,7 +711,7 @@
                             <Border Background="{StaticResource PanelAltBrush}"
                                     BorderBrush="{StaticResource LineBrush}"
                                     BorderThickness="1"
-                                    CornerRadius="8"
+                                    CornerRadius="0"
                                     Padding="12"
                                     Margin="0,16,0,0">
                                 <StackPanel>
@@ -768,7 +783,7 @@
                                                         Background="{StaticResource InputBrush}"
                                                         BorderBrush="{StaticResource LineBrush}"
                                                         BorderThickness="1"
-                                                        CornerRadius="8"
+                                                        CornerRadius="0"
                                                         MouseMove="SlotCard_MouseMove"
                                                         PreviewMouseLeftButtonDown="SlotCard_PreviewMouseLeftButtonDown">
                                                     <Grid>
@@ -783,7 +798,7 @@
                                                             <ColumnDefinition Width="*"/>
                                                             <ColumnDefinition Width="28"/>
                                                         </Grid.ColumnDefinitions>
-                                                        <Border Grid.RowSpan="3" Background="{Binding SectColor}" CornerRadius="4"/>
+                                                        <Border Grid.RowSpan="3" Background="{Binding SectColor}" CornerRadius="0"/>
                                                         <TextBlock Grid.Column="2" Text="{Binding NumberText}" FontWeight="Bold"/>
                                                         <Button Grid.Column="3"
                                                                 Content="{Binding FavoriteText}"
@@ -823,7 +838,7 @@
                                                         Background="{StaticResource PanelAltBrush}"
                                                         BorderBrush="{StaticResource AccentBrush}"
                                                         BorderThickness="1"
-                                                        CornerRadius="8"
+                                                        CornerRadius="0"
                                                         MouseMove="SlotCard_MouseMove"
                                                         PreviewMouseLeftButtonDown="SlotCard_PreviewMouseLeftButtonDown">
                                                     <StackPanel>
@@ -865,7 +880,7 @@
                                                     Background="{StaticResource InputBrush}"
                                                     BorderBrush="{StaticResource LineBrush}"
                                                     BorderThickness="1"
-                                                    CornerRadius="8"
+                                                    CornerRadius="0"
                                                     AllowDrop="True"
                                                     DragEnter="RoleCard_DragEnter"
                                                     Drop="RoleCard_Drop"
@@ -892,7 +907,7 @@
                 Background="{StaticResource PanelBrush}"
                 BorderBrush="{StaticResource LineBrush}"
                 BorderThickness="1"
-                CornerRadius="8"
+                CornerRadius="0"
                 Padding="12,8">
             <TextBlock Text="提示：保存档可跨角色覆盖；门派不匹配时会额外提醒宏、技能/动作按钮和完整 dump 的覆盖风险。覆盖前始终会自动备份目标角色。"
                        Foreground="{StaticResource MutedBrush}"

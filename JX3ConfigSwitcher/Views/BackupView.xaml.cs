@@ -34,11 +34,11 @@ public partial class BackupView : UserControl
 
         SetBrush("AccentBrush", accent);
         SetBrush("AccentTextBrush", accentText);
-        SetBrush("AccentSoftBrush", softAccent);
-        SetBrush("PanelBrush", panel);
-        SetBrush("PanelAltBrush", panelAlt);
-        SetBrush("InputBrush", input);
-        SetBrush("InputHoverBrush", Blend(accent, input, 0.82));
+        SetBrush("AccentSoftBrush", WithAlpha(softAccent, 210));
+        SetBrush("PanelBrush", WithAlpha(panel, 204));
+        SetBrush("PanelAltBrush", WithAlpha(panelAlt, 184));
+        SetBrush("InputBrush", WithAlpha(input, 204));
+        SetBrush("InputHoverBrush", WithAlpha(Blend(accent, input, 0.82), 214));
         SetBrush("LineBrush", line);
         SetBrush("LineStrongBrush", Blend(accent, Color.FromRgb(90, 84, 101), 0.58));
         SetBrush("AppBackground", Blend(accent, shellBackground, 0.92));
@@ -175,6 +175,9 @@ public partial class BackupView : UserControl
             (byte)((source.G * sourceWeight) + (target.G * targetWeight)),
             (byte)((source.B * sourceWeight) + (target.B * targetWeight)));
     }
+
+    private static Color WithAlpha(Color color, byte alpha) =>
+        Color.FromArgb(alpha, color.R, color.G, color.B);
 
     private static bool UseDarkText(Color color)
     {
