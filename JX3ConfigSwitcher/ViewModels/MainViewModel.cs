@@ -608,17 +608,27 @@ public sealed partial class MainViewModel : ObservableObject
     private void LoadProfiles()
     {
         Profiles.Clear();
-        var existingProfiles = _repository.GetProfiles().ToList();
-        foreach (var name in _profileHostApi.GetHostProfileNames()
+        var hostProfileNames = _profileHostApi.GetHostProfileNames()
                      .Where(name => !string.IsNullOrWhiteSpace(name))
                      .Select(name => name.Trim())
                      .Distinct(StringComparer.OrdinalIgnoreCase)
+                     .ToList();
+        var existingProfiles = _repository.GetProfiles().ToList();
+        foreach (var name in hostProfileNames
                      .Where(name => existingProfiles.All(profile => !string.Equals(profile.Name, name, StringComparison.OrdinalIgnoreCase))))
         {
             _repository.CreateProfile(name);
         }
 
-        foreach (var profile in _repository.GetProfiles())
+        var profiles = _repository.GetProfiles();
+        if (hostProfileNames.Count > 0)
+        {
+            profiles = profiles
+                .Where(profile => hostProfileNames.Contains(profile.Name, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        foreach (var profile in profiles)
         {
             Profiles.Add(profile);
         }

@@ -1,9 +1,12 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Effects;
 using JX3ConfigSwitcher.Models;
 using JX3ConfigSwitcher.ViewModels;
 
@@ -12,6 +15,7 @@ namespace JX3ConfigSwitcher.Views;
 public partial class BackupView : UserControl
 {
     private Point _dragStartPoint;
+    private Popup? _dragPopup;
 
     public BackupView()
     {
@@ -24,7 +28,7 @@ public partial class BackupView : UserControl
         var panelBase = Color.FromRgb(26, 35, 45);
         var panelAltBase = Color.FromRgb(21, 29, 38);
         var inputBase = Color.FromRgb(16, 23, 32);
-        var softAccent = Blend(accent, Color.FromRgb(24, 56, 74), 0.72);
+        var softAccent = Blend(accent, Color.FromRgb(96, 106, 115), 0.82);
         var panel = Blend(accent, panelBase, 0.9);
         var panelAlt = Blend(accent, panelAltBase, 0.93);
         var input = Blend(accent, inputBase, 0.95);
@@ -70,15 +74,26 @@ public partial class BackupView : UserControl
         if (element.DataContext is SlotViewModel { HasData: true } slot)
         {
             AnimateDragSource(element, isDragging: true);
+            element.GiveFeedback += SlotCard_GiveFeedback;
+            StartDragPreview(slot);
             try
             {
                 DragDrop.DoDragDrop(element, slot.Number, DragDropEffects.Copy);
             }
             finally
             {
+                StopDragPreview();
+                element.GiveFeedback -= SlotCard_GiveFeedback;
                 AnimateDragSource(element, isDragging: false);
             }
         }
+    }
+
+    private void SlotCard_GiveFeedback(object sender, GiveFeedbackEventArgs e)
+    {
+        UpdateDragPreviewPosition();
+        e.UseDefaultCursors = true;
+        e.Handled = true;
     }
 
     private void RoleCard_DragEnter(object sender, DragEventArgs e)
@@ -136,6 +151,122 @@ public partial class BackupView : UserControl
         AnimateDouble(element, OpacityProperty, toOpacity, 120);
     }
 
+    private void StartDragPreview(SlotViewModel slot)
+    {
+        StopDragPreview();
+        var accentBrush = (Brush)FindResource("AccentBrush");
+        var panelBrush = (Brush)FindResource("InputBrush");
+        var lineBrush = (Brush)FindResource("LineStrongBrush");
+        var mutedBrush = (Brush)FindResource("MutedBrush");
+        var textBrush = (Brush)FindResource("TextBrush");
+
+        _dragPopup = new Popup
+        {
+            AllowsTransparency = true,
+            Placement = PlacementMode.AbsolutePoint,
+            IsHitTestVisible = false,
+            PopupAnimation = PopupAnimation.Fade,
+            Child = new Border
+            {
+                Width = 168,
+                Height = 84,
+                Background = panelBrush,
+                BorderBrush = accentBrush,
+                BorderThickness = new Thickness(1.5),
+                Padding = new Thickness(12),
+                Effect = new DropShadowEffect
+                {
+                    Color = Colors.Black,
+                    BlurRadius = 22,
+                    ShadowDepth = 6,
+                    Opacity = 0.42
+                },
+                Child = new Grid
+                {
+                    ColumnDefinitions =
+                    {
+                        new ColumnDefinition { Width = new GridLength(4) },
+                        new ColumnDefinition { Width = new GridLength(10) },
+                        new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }
+                    },
+                    Children =
+                    {
+                        CreateSectBar(slot.SectColor),
+                        CreatePreviewText(slot, textBrush, mutedBrush, accentBrush)
+                    }
+                }
+            }
+        };
+
+        UpdateDragPreviewPosition();
+        _dragPopup.IsOpen = true;
+    }
+
+    private static Border CreateSectBar(string sectColor)
+    {
+        var brush = TryBrush(sectColor) ?? Brushes.DeepSkyBlue;
+        return new Border
+        {
+            Background = brush
+        };
+    }
+
+    private static StackPanel CreatePreviewText(SlotViewModel slot, Brush textBrush, Brush mutedBrush, Brush accentBrush)
+    {
+        var panel = new StackPanel { Margin = new Thickness(14, 0, 0, 0) };
+        Grid.SetColumn(panel, 2);
+        panel.Children.Add(new TextBlock
+        {
+            Text = slot.NumberText,
+            Foreground = accentBrush,
+            FontWeight = FontWeights.Bold,
+            FontSize = 14
+        });
+        panel.Children.Add(new TextBlock
+        {
+            Text = slot.Name,
+            Foreground = textBrush,
+            FontWeight = FontWeights.SemiBold,
+            TextTrimming = TextTrimming.CharacterEllipsis
+        });
+        panel.Children.Add(new TextBlock
+        {
+            Text = string.IsNullOrWhiteSpace(slot.SectTag) ? slot.KindText : slot.SectTag,
+            Foreground = mutedBrush,
+            FontSize = 11,
+            TextTrimming = TextTrimming.CharacterEllipsis
+        });
+        return panel;
+    }
+
+    private void UpdateDragPreviewPosition()
+    {
+        if (_dragPopup is null)
+        {
+            return;
+        }
+
+        if (!GetCursorPos(out var point))
+        {
+            return;
+        }
+
+        _dragPopup.HorizontalOffset = point.X + 14;
+        _dragPopup.VerticalOffset = point.Y + 18;
+    }
+
+    private void StopDragPreview()
+    {
+        if (_dragPopup is null)
+        {
+            return;
+        }
+
+        _dragPopup.IsOpen = false;
+        _dragPopup.Child = null;
+        _dragPopup = null;
+    }
+
     private void AnimateDropTarget(FrameworkElement element, bool isActive)
     {
         EnsureScaleTransform(element);
@@ -179,6 +310,18 @@ public partial class BackupView : UserControl
     private static Color WithAlpha(Color color, byte alpha) =>
         Color.FromArgb(alpha, color.R, color.G, color.B);
 
+    private static Brush? TryBrush(string value)
+    {
+        try
+        {
+            return (Brush)new BrushConverter().ConvertFromString(value)!;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     private static bool UseDarkText(Color color)
     {
         var luminance = (0.2126 * color.R) + (0.7152 * color.G) + (0.0722 * color.B);
@@ -206,4 +349,14 @@ public partial class BackupView : UserControl
                 FillBehavior = FillBehavior.HoldEnd
             });
     }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct POINT
+    {
+        public int X;
+        public int Y;
+    }
+
+    [DllImport("user32.dll")]
+    private static extern bool GetCursorPos(out POINT lpPoint);
 }
